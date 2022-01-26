@@ -16,7 +16,7 @@ public class AppInitializer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        AnchorPane load = FXMLLoader.load(getClass().getResource("view/SplashScreenForm.fxml"));
+        AnchorPane load = FXMLLoader.load(getClass().getResource("view/AdminHomeForm.fxml"));
         Scene scene = new Scene(load);
         scene.setFill(Color.TRANSPARENT);
         primaryStage.setScene(scene);
