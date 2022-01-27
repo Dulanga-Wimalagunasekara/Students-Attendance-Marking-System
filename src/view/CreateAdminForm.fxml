@@ -37,10 +37,7 @@
                 <PasswordField fx:id="txtConfirmPassword" alignment="CENTER" layoutX="10.0" layoutY="160.0" promptText="Confirm your password" />
                 <FlowPane alignment="CENTER" vgap="10.0">
                     <children>
-                        <Button fx:id="btnCreateAccount" alignment="CENTER" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false"
-                                text="Create Account" >
-                           <!--<onAction>#btnCreateAccount_OnAction</onAction>-->
-                        </Button>
+                        <Button fx:id="btnCreateAccount" alignment="CENTER" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#btnCreateAccount_OnAction" text="Create Account" />
                     </children>
                     <VBox.margin>
                         <Insets top="5.0" />

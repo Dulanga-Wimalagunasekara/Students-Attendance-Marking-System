@@ -26,7 +26,6 @@ public class SplashScreenFormController {
     public void initialize() {
         establishConnection();
 
-
     }
 
     public void establishConnection() {
