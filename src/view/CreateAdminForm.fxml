@@ -39,7 +39,7 @@
                     <children>
                         <Button fx:id="btnCreateAccount" alignment="CENTER" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false"
                                 text="Create Account" >
-                            <onAction>#btnCreateAccount_OnAction</onAction>
+                           <!--<onAction>#btnCreateAccount_OnAction</onAction>-->
                         </Button>
                     </children>
                     <VBox.margin>

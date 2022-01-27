@@ -1,5 +1,6 @@
 DROP DATABASE IF EXISTS dep8_student_attendance;
 
+
 CREATE DATABASE dep8_student_attendance;
 
 USE dep8_student_attendance;
