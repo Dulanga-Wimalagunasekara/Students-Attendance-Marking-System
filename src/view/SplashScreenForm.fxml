@@ -7,26 +7,29 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="428.0" prefWidth="347.0" style="-fx-background-color: rgba(0,0,0,0); -fx-background-radius: 10;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SplashScreenFormController">
+<AnchorPane prefHeight="437.0" prefWidth="341.0" style="-fx-background-color: rgba(0,0,0,0); -fx-background-radius: 10;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SplashScreenFormController">
     <children>
-        <ImageView fitHeight="294.0" fitWidth="347.0" layoutX="88.0" layoutY="-15.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="0.0">
+        <ImageView fitHeight="288.0" fitWidth="361.0" layoutX="57.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="57.0" AnchorPane.rightAnchor="56.44329833984375" AnchorPane.topAnchor="14.0">
             <image>
-                <Image url="@../assets/loading2.gif" />
+                <Image url="@assets/loader.gif" />
             </image>
         </ImageView>
-        <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#82c1ffb3" height="101.0" layoutX="1.0" layoutY="336.0" stroke="TRANSPARENT" strokeLineCap="ROUND" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="0.0" width="347.0" />
-        <Label layoutX="56.0" layoutY="360.0" text="Student Attendance System" AnchorPane.leftAnchor="56.0" AnchorPane.rightAnchor="47.0">
+        <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#82c1ffb3" height="101.0" layoutX="1.0" layoutY="336.0" stroke="TRANSPARENT" strokeLineCap="ROUND" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="0.0" width="401.0" />
+        <Label layoutX="85.0" layoutY="351.0" prefHeight="20.0" prefWidth="233.0" text="Student Attendance System" AnchorPane.leftAnchor="85.0" AnchorPane.rightAnchor="84.0">
             <font>
                 <Font size="16.0" />
             </font>
         </Label>
-        <Label layoutX="41.0" layoutY="388.0" prefHeight="14.0" prefWidth="270.0" text="Copyright © 2022 Dulanga Wimalagunasekara. ">
+        <Label layoutX="66.0" layoutY="380.0" prefHeight="14.0" prefWidth="270.0" text="Copyright © 2022 Dulanga Wimalagunasekara. ">
             <font>
                 <Font size="11.0" />
             </font>
         </Label>
-        <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="13.0" layoutY="305.0" prefHeight="16.0" prefWidth="319.0" text="Initializing" textAlignment="CENTER" textFill="#084b6f" />
-      <Label layoutX="121.0" layoutY="411.0" prefHeight="14.0" prefWidth="114.0" text="All Rights Reserved.">
+        <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="42.0" layoutY="309.0" prefHeight="16.0" prefWidth="319.0" text="Initializing" textAlignment="CENTER" textFill="#17a825">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font></Label>
+      <Label layoutX="140.0" layoutY="404.0" prefHeight="14.0" prefWidth="114.0" text="All Rights Reserved.">
          <font>
             <Font size="11.0" />
          </font>

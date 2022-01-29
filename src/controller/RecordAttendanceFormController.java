@@ -8,10 +8,11 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.IOException;
+
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,18 +23,16 @@ import java.util.Date;
 public class RecordAttendanceFormController {
     public TextField txtStudentID;
     public ImageView imgProfile;
-    public Button btnIn;
-    public Button btnOut;
     public Label lblDate;
     public Label lblID;
     public Label lblName;
     public Label lblStatus;
     public Label lblStudentName;
+    public ToggleButton btnIn;
+    public ToggleButton btnOut;
     private PreparedStatement stm;
 
     public void initialize(){
-        btnIn.setDisable(true);
-        btnOut.setDisable(true);
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.INDEFINITE, event -> {
             lblDate.setText(String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %1$Tp",new Date()));
@@ -43,6 +42,7 @@ public class RecordAttendanceFormController {
         timeline.play();
 
         Connection connection = DBConnection.getInstance().getConnection();
+
         try {
             stm = connection.prepareStatement("SELECT * FROM student WHERE id=?");
         } catch (SQLException e) {
@@ -51,6 +51,34 @@ public class RecordAttendanceFormController {
             ((Stage)btnOut.getScene().getWindow()).close();
         }
 
+        txtStudentID.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!txtStudentID.getText().isEmpty()){
+                if (!btnIn.isSelected() && !btnOut.isSelected()){
+                    txtStudentID.clear();
+                    new Alert(Alert.AlertType.ERROR,"Please Select an Option(IN/OUT) to Continue.").show();
+                }
+            }
+
+        });
+
+        btnIn.selectedProperty().addListener(observable -> {
+            if (btnIn.isSelected()){
+                btnIn.setStyle("-fx-background-color: lightblue");
+            }else {
+                btnIn.setStyle("-fx-background-color: green");
+            }
+            txtStudentID.requestFocus();
+
+        });
+
+        btnOut.selectedProperty().addListener(observable -> {
+            if (btnOut.isSelected()){
+                btnOut.setStyle("-fx-background-color: lightblue");
+            }else {
+                btnOut.setStyle("-fx-background-color: red");
+            }
+            txtStudentID.requestFocus();
+        });
 
     }
 
@@ -89,11 +117,4 @@ public class RecordAttendanceFormController {
         }
     }
 
-    public void btnIn_OnAction(ActionEvent actionEvent) {
-
-    }
-
-    public void btnOut_OnAction(ActionEvent actionEvent) {
-
-    }
 }
