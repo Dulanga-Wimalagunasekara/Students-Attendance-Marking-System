@@ -8,16 +8,17 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import okhttp3.*;
+import security.SecurityContextHolder;
+import sun.net.www.http.HttpClient;
 
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.sql.*;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
 
 public class RecordAttendanceFormController {
@@ -34,7 +35,8 @@ public class RecordAttendanceFormController {
 
     public void initialize(){
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.INDEFINITE, event -> {
+        lblDate.setText(String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %1$Tp",new Date()));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             lblDate.setText(String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %1$Tp",new Date()));
         }));
 
@@ -46,7 +48,7 @@ public class RecordAttendanceFormController {
         try {
             stm = connection.prepareStatement("SELECT * FROM student WHERE id=?");
         } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR,"Failed to connect with the database! Please contact Dulanga.", ButtonType.OK).show();
+            new Alert(Alert.AlertType.ERROR,"Failed to connect with the database!", ButtonType.OK).show();
             e.printStackTrace();
             ((Stage)btnOut.getScene().getWindow()).close();
         }
@@ -55,7 +57,7 @@ public class RecordAttendanceFormController {
             if (!txtStudentID.getText().isEmpty()){
                 if (!btnIn.isSelected() && !btnOut.isSelected()){
                     txtStudentID.clear();
-                    new Alert(Alert.AlertType.ERROR,"Please Select an Option(IN/OUT) to Continue.").show();
+                    new Alert(Alert.AlertType.WARNING,"Please Select an Option(IN/OUT) to Continue.").show();
                 }
             }
 
@@ -83,8 +85,7 @@ public class RecordAttendanceFormController {
     }
 
     public void txtStudentID_OnAction(ActionEvent actionEvent) {
-        btnIn.setDisable(true);
-        btnOut.setDisable(true);
+
         lblStudentName.setText("Please enter/scan the student ID to proceed");
         imgProfile.setImage(new Image("/view/assets/qr-code.png"));
 
@@ -100,8 +101,8 @@ public class RecordAttendanceFormController {
                 lblStudentName.setText(rst.getString("name").toUpperCase());
                 InputStream is = rst.getBlob("picture").getBinaryStream();
                 imgProfile.setImage(new Image(is));
-                btnIn.setDisable(false);
-                btnOut.setDisable(false);
+                sendSMS(txtStudentID.getText());
+                insertIntoDatabase();
                 txtStudentID.selectAll();
             }else{
                 new Alert(Alert.AlertType.ERROR, "Invalid Student ID, Try again!", ButtonType.OK).show();
@@ -114,6 +115,57 @@ public class RecordAttendanceFormController {
             new Alert(Alert.AlertType.WARNING, "Something went wrong. Please try again!",ButtonType.OK).show();
             txtStudentID.selectAll();
             txtStudentID.requestFocus();
+        }
+    }
+
+    private void sendSMS(String id) {
+
+        /*Todo: Edit the sms with student details*/
+        new Thread(() -> {
+            System.out.println("getting into the initialize method");
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType,"{\n\"message\":\"Dulanga is attending to the class...!\",\n\"phoneNumber\":\"0712742787\"\n}");
+            Request request = new Request.Builder()
+                    .url("https://api.smshub.lk/api/v1/send/single")
+                    .method("POST", body)
+                    .addHeader("Authorization", "TOKEN IS HERE")
+                    .addHeader("Content-Type", "application/json")
+                    .build();
+            try {
+                Response response = client.newCall(request).execute();
+            } catch (Throwable e) {
+                new Alert(Alert.AlertType.ERROR,"Failed to send the sms. Please try again!",ButtonType.OK).show();
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void insertIntoDatabase() throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        try {
+                connection.setAutoCommit(false);
+                PreparedStatement stm2 = connection.prepareStatement("INSERT INTO attendance (date, status, student_id, username) " +
+                        "VALUES (date=?,status=?,student_id=?,username=?)");
+                Date date = new Date();
+                stm2.setTime(1,new Time(date.getTime()));
+                stm2.setString(2,btnIn.isSelected()? "IN":"OUT");
+                System.out.println(txtStudentID.getText());
+                stm2.setString(3,txtStudentID.getText());
+                System.out.println(SecurityContextHolder.getPrincipal().getName());
+                stm2.setString(4,SecurityContextHolder.getPrincipal().getName());
+                int i = stm2.executeUpdate();
+                connection.setAutoCommit(true);
+
+                if (i!=1){
+                    throw new RuntimeException("Failed to execute the statement");
+                }
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR,"Failed to initialize the database!",ButtonType.OK).show();
+            connection.rollback();
         }
     }
 

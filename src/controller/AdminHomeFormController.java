@@ -1,12 +1,10 @@
 package controller;
 
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import security.SecurityContextHolder;
@@ -58,6 +56,7 @@ public class AdminHomeFormController {
     }
 
     public void btnBackupRestore_OnAction(ActionEvent actionEvent) {
+
     }
 
     public void btnSignOut_OnAction(ActionEvent actionEvent) throws IOException {
@@ -88,6 +87,7 @@ public class AdminHomeFormController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
     public void btnViewReports_OnAction(ActionEvent actionEvent) {
