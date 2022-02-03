@@ -49,6 +49,11 @@ public class LoginFormController {
                     stage.setResizable(false);
                     stage.show();
                     ((Stage) btnSignIn.getScene().getWindow()).close();
+                }else{
+                    new Alert(Alert.AlertType.WARNING,"Invalid username or password.Please Try Again!").show();
+                    txtUserName.clear();
+                    txtPassword.clear();
+                    txtUserName.requestFocus();
                 }
 
             } catch (SQLException | IOException e) {

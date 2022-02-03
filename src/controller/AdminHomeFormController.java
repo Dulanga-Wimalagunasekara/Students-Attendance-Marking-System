@@ -51,11 +51,25 @@ public class AdminHomeFormController {
         lblHover.setText(initialText);
     }
 
-    public void btnManageUsers_OnAction(ActionEvent actionEvent) {
+    public void btnManageUsers_OnAction(ActionEvent actionEvent){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ManageUsersForm.fxml"));
+            AnchorPane load = fxmlLoader.load();
+            Scene scene = new Scene(load);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.centerOnScreen();
+            stage.sizeToScene();
+            stage.setResizable(false);
+            stage.initOwner(btnRecordAttendance.getScene().getWindow());
+            stage.show();
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void btnBackupRestore_OnAction(ActionEvent actionEvent) {
+    public void btnBackupRestore_OnAction(ActionEvent actionEvent) throws IOException {
 
     }
 

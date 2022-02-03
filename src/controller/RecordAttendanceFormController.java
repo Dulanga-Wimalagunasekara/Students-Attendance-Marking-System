@@ -12,13 +12,14 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import okhttp3.*;
 import security.SecurityContextHolder;
-import sun.net.www.http.HttpClient;
 
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.sql.Connection;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class RecordAttendanceFormController {
@@ -33,11 +34,11 @@ public class RecordAttendanceFormController {
     public ToggleButton btnOut;
     private PreparedStatement stm;
 
-    public void initialize(){
+    public void initialize() {
 
-        lblDate.setText(String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %1$Tp",new Date()));
+        lblDate.setText(String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %1$Tp", new Date()));
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            lblDate.setText(String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %1$Tp",new Date()));
+            lblDate.setText(String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %1$Tp", new Date()));
         }));
 
         timeline.setCycleCount(Animation.INDEFINITE);
@@ -48,25 +49,26 @@ public class RecordAttendanceFormController {
         try {
             stm = connection.prepareStatement("SELECT * FROM student WHERE id=?");
         } catch (SQLException e) {
-            new Alert(Alert.AlertType.ERROR,"Failed to connect with the database!", ButtonType.OK).show();
+            new Alert(Alert.AlertType.ERROR, "Failed to connect with the database!", ButtonType.OK).show();
             e.printStackTrace();
-            ((Stage)btnOut.getScene().getWindow()).close();
+            ((Stage) btnOut.getScene().getWindow()).close();
         }
 
         txtStudentID.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!txtStudentID.getText().isEmpty()){
-                if (!btnIn.isSelected() && !btnOut.isSelected()){
+            if (!txtStudentID.getText().isEmpty()) {
+                if (!btnIn.isSelected() && !btnOut.isSelected()) {
                     txtStudentID.clear();
-                    new Alert(Alert.AlertType.WARNING,"Please Select an Option(IN/OUT) to Continue.").show();
+                    new Alert(Alert.AlertType.WARNING, "Please Select an Option(IN/OUT) to Continue.").show();
                 }
             }
 
         });
 
         btnIn.selectedProperty().addListener(observable -> {
-            if (btnIn.isSelected()){
+            txtStudentID.selectAll();
+            if (btnIn.isSelected()) {
                 btnIn.setStyle("-fx-background-color: lightblue");
-            }else {
+            } else {
                 btnIn.setStyle("-fx-background-color: green");
             }
             txtStudentID.requestFocus();
@@ -74,13 +76,16 @@ public class RecordAttendanceFormController {
         });
 
         btnOut.selectedProperty().addListener(observable -> {
-            if (btnOut.isSelected()){
+            txtStudentID.selectAll();
+            if (btnOut.isSelected()) {
                 btnOut.setStyle("-fx-background-color: lightblue");
-            }else {
+            } else {
                 btnOut.setStyle("-fx-background-color: red");
             }
             txtStudentID.requestFocus();
         });
+
+        updateLabels();
 
     }
 
@@ -89,7 +94,7 @@ public class RecordAttendanceFormController {
         lblStudentName.setText("Please enter/scan the student ID to proceed");
         imgProfile.setImage(new Image("/view/assets/qr-code.png"));
 
-        if (txtStudentID.getText().trim().isEmpty()){
+        if (txtStudentID.getText().trim().isEmpty()) {
             return;
         }
 
@@ -97,14 +102,13 @@ public class RecordAttendanceFormController {
             stm.setString(1, txtStudentID.getText().trim());
             ResultSet rst = stm.executeQuery();
 
-            if (rst.next()){
+            if (rst.next()) {
                 lblStudentName.setText(rst.getString("name").toUpperCase());
                 InputStream is = rst.getBlob("picture").getBinaryStream();
                 imgProfile.setImage(new Image(is));
-                sendSMS(txtStudentID.getText());
                 insertIntoDatabase();
                 txtStudentID.selectAll();
-            }else{
+            } else {
                 new Alert(Alert.AlertType.ERROR, "Invalid Student ID, Try again!", ButtonType.OK).show();
                 txtStudentID.selectAll();
                 txtStudentID.requestFocus();
@@ -112,60 +116,124 @@ public class RecordAttendanceFormController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.WARNING, "Something went wrong. Please try again!",ButtonType.OK).show();
+            new Alert(Alert.AlertType.WARNING, "Something went wrong. Please try again!", ButtonType.OK).show();
             txtStudentID.selectAll();
             txtStudentID.requestFocus();
         }
     }
 
-    private void sendSMS(String id) {
+    private void sendSMS(String id,LocalDateTime dateTime) {
 
-        /*Todo: Edit the sms with student details*/
         new Thread(() -> {
-            System.out.println("getting into the initialize method");
+            Connection connection = DBConnection.getInstance().getConnection();
+            String message;
+            String contact;
+            try {
+                connection.setAutoCommit(false);
+                PreparedStatement stm1 = connection.prepareStatement("SELECT status FROM attendance WHERE student_id=? ORDER BY id DESC LIMIT 1");
+                stm1.setString(1,id);
+                ResultSet rstAttendance = stm1.executeQuery();
+                PreparedStatement stm2 = connection.prepareStatement("SELECT name,contact FROM student WHERE id=?");
+                stm2.setString(1,id);
+                ResultSet rstStudent = stm2.executeQuery();
+                connection.commit();
+                if (rstStudent.next() && rstAttendance.next()){
+                    if (btnIn.isSelected()){
+                        message=rstStudent.getString("name")+" is attending to the class. AT: "+dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))+" Status: "+rstAttendance.getString("status");
+                    }else{
+                        message=rstStudent.getString("name")+" is leaving the class. AT: "+dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))+" Status: "+rstAttendance.getString("status");
+                    }
+                    contact=rstStudent.getString("contact");
+                }else {
+                    throw new RuntimeException("Something went wrong. Please try again.");
+                }
+
+            } catch (Throwable e) {
+                e.printStackTrace();
+                rollbackConnection(connection);
+                return;
+            }finally {
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println(message);
+            System.out.println(contact);
+
+            String content ="{\n\"message\":\""+message+"\",\n\"phoneNumber\":\""+contact+"\"\n}";
+            System.out.println(content);
+
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
             MediaType mediaType = MediaType.parse("application/json");
-            RequestBody body = RequestBody.create(mediaType,"{\n\"message\":\"Dulanga is attending to the class...!\",\n\"phoneNumber\":\"0712742787\"\n}");
+            RequestBody body = RequestBody.create(mediaType, content);
             Request request = new Request.Builder()
                     .url("https://api.smshub.lk/api/v1/send/single")
                     .method("POST", body)
-                    .addHeader("Authorization", "TOKEN IS HERE")
+                    .addHeader("Authorization", "TOKEN HERE")
                     .addHeader("Content-Type", "application/json")
                     .build();
             try {
                 Response response = client.newCall(request).execute();
-            } catch (Throwable e) {
-                new Alert(Alert.AlertType.ERROR,"Failed to send the sms. Please try again!",ButtonType.OK).show();
+                System.out.println(response);
+            } catch (IOException e) {
                 e.printStackTrace();
+                new Alert(Alert.AlertType.WARNING,"SMS Sending Failed!. Please try again",ButtonType.OK).show();
             }
         }).start();
     }
 
+    private void rollbackConnection(Connection connection) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+    }
+
     private void insertIntoDatabase() throws SQLException {
+
         Connection connection = DBConnection.getInstance().getConnection();
         try {
-                connection.setAutoCommit(false);
-                PreparedStatement stm2 = connection.prepareStatement("INSERT INTO attendance (date, status, student_id, username) " +
-                        "VALUES (date=?,status=?,student_id=?,username=?)");
-                Date date = new Date();
-                stm2.setTime(1,new Time(date.getTime()));
-                stm2.setString(2,btnIn.isSelected()? "IN":"OUT");
-                System.out.println(txtStudentID.getText());
-                stm2.setString(3,txtStudentID.getText());
-                System.out.println(SecurityContextHolder.getPrincipal().getName());
-                stm2.setString(4,SecurityContextHolder.getPrincipal().getName());
-                int i = stm2.executeUpdate();
-                connection.setAutoCommit(true);
-
-                if (i!=1){
-                    throw new RuntimeException("Failed to execute the statement");
-                }
+            PreparedStatement stm2 = connection.prepareStatement("INSERT INTO attendance (date, status, student_id, username) VALUES (?,?,?,?)");
+            LocalDateTime dateTime = LocalDateTime.now();
+            stm2.setObject(1,dateTime);
+            stm2.setString(2, btnIn.isSelected() ? "IN" : "OUT");
+            stm2.setString(3,txtStudentID.getText());
+            stm2.setString(4,SecurityContextHolder.getPrincipal().getUsername());
+            int i = stm2.executeUpdate();
+            if (i != 1) {
+                throw new RuntimeException("Failed to execute the statement");
+            }
+            updateLabels();
+//            sendSMS(txtStudentID.getText(),dateTime);
 
         } catch (Throwable e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR,"Failed to initialize the database!",ButtonType.OK).show();
-            connection.rollback();
+            new Alert(Alert.AlertType.ERROR, "Failed to initialize the database!", ButtonType.OK).show();
+        }
+    }
+
+    private void updateLabels() {
+        Connection connection = DBConnection.getInstance().getConnection();
+        try {
+            PreparedStatement stm = connection.prepareStatement("SELECT * FROM attendance ORDER BY id DESC LIMIT 1");
+            ResultSet rst = stm.executeQuery();
+            if (rst.next()){
+                PreparedStatement stm2 = connection.prepareStatement("SELECT name FROM student WHERE id=?");
+                stm2.setString(1,rst.getString("student_id"));
+                ResultSet rst2 = stm2.executeQuery();
+                rst2.next();
+                lblID.setText("ID: "+rst.getString("student_id"));
+                lblName.setText("Name: "+rst2.getString("name"));
+                Object date = rst.getObject("date");
+                LocalDateTime dateTime= (LocalDateTime) date;
+                lblStatus.setText(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +" - "+rst.getString("status"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

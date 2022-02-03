@@ -9,7 +9,9 @@ CREATE TABLE student
 (
     id VARCHAR(30) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    picture LONGBLOB NOT NULL
+    picture LONGBLOB NOT NULL,
+    contact VARCHAR(15) NOT NULL,
+    grade INT NOT NULL
 );
 
 CREATE TABLE user
@@ -23,8 +25,11 @@ CREATE TABLE user
 CREATE TABLE attendance
 (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    date TIME NOT NULL,
+    date DATETIME NOT NULL,
     status ENUM ('IN', 'OUT') NOT NULL,
     student_id VARCHAR(30) NOT NULL,
-    username VARCHAR(30) NOT NULL
+    username VARCHAR(30) NOT NULL,
+    CONSTRAINT fk_attendance_student FOREIGN KEY(student_id) REFERENCES student(id),
+    CONSTRAINT fk_attendance_user FOREIGN KEY (username) REFERENCES user(username)
+
 );
