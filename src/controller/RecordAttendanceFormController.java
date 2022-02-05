@@ -106,7 +106,7 @@ public class RecordAttendanceFormController {
                 lblStudentName.setText(rst.getString("name").toUpperCase());
                 InputStream is = rst.getBlob("picture").getBinaryStream();
                 imgProfile.setImage(new Image(is));
-                insertIntoDatabase();
+                insertIntoDatabase(rst.getString("name"),rst.getString("id"),rst.getString("grade"));
                 txtStudentID.selectAll();
             } else {
                 new Alert(Alert.AlertType.ERROR, "Invalid Student ID, Try again!", ButtonType.OK).show();
@@ -193,16 +193,19 @@ public class RecordAttendanceFormController {
             }
     }
 
-    private void insertIntoDatabase() throws SQLException {
+    private void insertIntoDatabase(String name, String id, String grade) throws SQLException {
 
         Connection connection = DBConnection.getInstance().getConnection();
         try {
-            PreparedStatement stm2 = connection.prepareStatement("INSERT INTO attendance (date, status, student_id, username) VALUES (?,?,?,?)");
+            PreparedStatement stm2 = connection.prepareStatement("INSERT INTO attendance (date, status, student_id, username,name,grade) VALUES (?,?,?,?,?,?)");
             LocalDateTime dateTime = LocalDateTime.now();
             stm2.setObject(1,dateTime);
             stm2.setString(2, btnIn.isSelected() ? "IN" : "OUT");
-            stm2.setString(3,txtStudentID.getText());
+            stm2.setString(3,id);
             stm2.setString(4,SecurityContextHolder.getPrincipal().getUsername());
+            stm2.setString(5,name);
+            stm2.setString(6,grade);
+
             int i = stm2.executeUpdate();
             if (i != 1) {
                 throw new RuntimeException("Failed to execute the statement");

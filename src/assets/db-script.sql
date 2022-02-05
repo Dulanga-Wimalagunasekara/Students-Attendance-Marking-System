@@ -26,6 +26,8 @@ CREATE TABLE attendance
 (
     id INT AUTO_INCREMENT PRIMARY KEY,
     date DATETIME NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    grade VARCHAR(10) NOT NULL,
     status ENUM ('IN', 'OUT') NOT NULL,
     student_id VARCHAR(30) NOT NULL,
     username VARCHAR(30) NOT NULL,
