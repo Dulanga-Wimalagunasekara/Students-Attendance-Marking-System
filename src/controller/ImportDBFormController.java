@@ -9,7 +9,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.nio.file.Files;
 
 public class ImportDBFormController {
 
@@ -43,7 +42,7 @@ public class ImportDBFormController {
         ((Stage)btnOK.getScene().getWindow()).close();
     }
 
-    public void initFileProperty(SimpleObjectProperty fileProperty){
+    public void initFileProperty(SimpleObjectProperty<File> fileProperty){
 
         this.fileProperty=fileProperty;
     }

@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="818.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewReportsFormController">
+<AnchorPane prefHeight="818.0" prefWidth="1300.0" stylesheets="/view/style/ViewReportsFormStyles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewReportsFormController">
    <children>
       <TableView fx:id="tblAttendance" layoutX="-2.0" layoutY="172.0" prefHeight="646.0" prefWidth="1307.0" style="-fx-background-color: #d4fff9; -fx-background-radius: 10px;">
          <columns>
@@ -28,5 +32,17 @@
          </font>
       </Label>
       <ChoiceBox fx:id="choBox" layoutX="338.0" layoutY="135.0" prefWidth="150.0" />
+      <Button fx:id="btnFilter" layoutX="1244.0" layoutY="110.0" mnemonicParsing="false" onAction="#btnFilterOnAction" prefHeight="60.0" prefWidth="44.0">
+         <graphic>
+            <ImageView blendMode="COLOR_BURN" fitHeight="34.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@assets/filter.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <cursor>
+            <Cursor fx:constant="OPEN_HAND" />
+         </cursor>
+      </Button>
    </children>
 </AnchorPane>

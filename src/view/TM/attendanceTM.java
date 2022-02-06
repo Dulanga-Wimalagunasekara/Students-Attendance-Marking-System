@@ -1,15 +1,17 @@
 package view.TM;
 
+import java.time.LocalDateTime;
+
 public class attendanceTM {
     private int order;
-    private Object date;
+    private LocalDateTime date;
     private String name;
     private int grade;
     private String status;
     private String studentId;
     private String operator;
 
-    public attendanceTM(int order, Object date, String name, int grade, String status, String studentId, String operator) {
+    public attendanceTM(int order, LocalDateTime date, String name, int grade, String status, String studentId, String operator) {
 
         this.order = order;
         this.date = date;
@@ -32,11 +34,11 @@ public class attendanceTM {
         this.order = order;
     }
 
-    public Object getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(Object date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

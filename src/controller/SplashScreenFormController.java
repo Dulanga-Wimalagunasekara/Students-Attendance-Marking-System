@@ -3,12 +3,15 @@ package controller;
 import db.DBConnection;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,9 +74,8 @@ public class SplashScreenFormController {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initOwner(lblStatus.getScene().getWindow());
             stage.centerOnScreen();
-            stage.setOnCloseRequest(event -> {
-                event.consume();
-            });
+            stage.setOnCloseRequest(Event::consume);
+
             stage.showAndWait();
 
             if (fileProperty.getValue()==null) {
