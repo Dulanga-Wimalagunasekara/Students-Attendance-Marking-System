@@ -12,7 +12,6 @@ public class Principal {
     }
 
     public Principal() {
-
     }
 
     public String getUsername() {

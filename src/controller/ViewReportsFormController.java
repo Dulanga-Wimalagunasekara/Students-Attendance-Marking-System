@@ -11,7 +11,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -38,6 +37,7 @@ public class ViewReportsFormController {
     public TextField txtSearch;
     public ChoiceBox<String> choBox;
     public Button btnFilter;
+    public Button btnBackup;
     ObservableList<attendanceTM> items;
 
     public void initialize() {
@@ -152,15 +152,14 @@ public class ViewReportsFormController {
     }
 
     private void selectFilters(LocalDate dateStart, LocalDate dateEnd){
-        txtSearch.clear();
-        ObservableList<attendanceTM> tblItems = tblAttendance.getItems();
+        ObservableList<attendanceTM> tblItems = this.items;
         tblItems.clear();
         String formatStart = dateStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String formatEnd = dateEnd.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         Connection connection = DBConnection.getInstance().getConnection();
         try {
-            PreparedStatement stm = connection.prepareStatement("SELECT * FROM attendance WHERE date BETWEEN ? AND ?");
+            PreparedStatement stm = connection.prepareStatement("SELECT * FROM attendance WHERE date BETWEEN ? AND ? ORDER BY date DESC ");
             stm.setString(1,formatStart+" 00:00:00");
             stm.setString(2,formatEnd+" 23:59:59");
             ResultSet rst = stm.executeQuery();
@@ -200,6 +199,7 @@ public class ViewReportsFormController {
             try {
                 OutputStream outputStream = Files.newOutputStream(path);
                 book.write(outputStream);
+                outputStream.close();
                 new Alert(Alert.AlertType.CONFIRMATION,"Backup Success!",ButtonType.OK).show();
             } catch (IOException e) {
                 new Alert(Alert.AlertType.ERROR,"Something went wrong! Please try again!").show();

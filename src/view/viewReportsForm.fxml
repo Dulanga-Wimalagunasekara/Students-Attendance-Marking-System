@@ -26,7 +26,7 @@
          </columns>
       </TableView>
       <TextField fx:id="txtSearch" layoutX="3.0" layoutY="128.0" prefHeight="26.0" prefWidth="323.0" promptText="Search" />
-      <Label layoutX="511.0" layoutY="37.0" prefHeight="30.0" prefWidth="282.0" text="Attendance Report">
+      <Label layoutX="289.0" layoutY="30.0" prefHeight="30.0" prefWidth="728.0" text="Students' Attendance System - Attendance Report">
          <font>
             <Font name="System Bold" size="25.0" />
          </font>
@@ -44,7 +44,7 @@
             <Cursor fx:constant="OPEN_HAND" />
          </cursor>
       </Button>
-      <Button contentDisplay="TOP" layoutX="1229.0" layoutY="101.0" mnemonicParsing="false" onAction="#btnBackupOnAction" prefHeight="64.0" prefWidth="69.0" text="Backup">
+      <Button fx:id="btnBackup" contentDisplay="TOP" layoutX="1229.0" layoutY="101.0" mnemonicParsing="false" onAction="#btnBackupOnAction" prefHeight="64.0" prefWidth="69.0" text="Backup">
          <graphic>
             <ImageView fitHeight="31.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
                <image>

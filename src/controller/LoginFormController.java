@@ -7,13 +7,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import netscape.security.UserTarget;
+
 import security.Principal;
 import security.SecurityContextHolder;
 
 import java.io.IOException;
 import java.sql.*;
-import java.util.Objects;
+
 
 public class LoginFormController {
     public TextField txtUserName;

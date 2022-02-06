@@ -1,4 +1,9 @@
 #btnFilter:hover{
-    -fx-background-color: #0392ff !important;
+    -fx-background-color: #8ff6ff !important;
+    -fx-background-radius: 10px;
+}
+
+#btnBackup:hover{
+    -fx-background-color: #caff80 !important;
     -fx-background-radius: 10px;
 }
