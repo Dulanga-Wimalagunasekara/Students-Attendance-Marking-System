@@ -1,14 +1,13 @@
 package controller;
 
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import security.SecurityContextHolder;
 
 import java.io.IOException;
 
@@ -18,6 +17,7 @@ public class UserHomeFormController {
     public Button btnUserProfile;
     public Button btnSignOut;
     public Label lblOption;
+    public Label lblUserName;
 
     String initialText;
     public void initialize(){
@@ -31,6 +31,8 @@ public class UserHomeFormController {
         btnViewReports.setOnMouseExited(event -> setInitialText() );
         btnUserProfile.setOnMouseExited(event -> setInitialText() );
         btnSignOut.setOnMouseExited(event -> setInitialText() );
+
+        lblUserName.setText("Welcome "+SecurityContextHolder.getPrincipal().getUsername()+"!");
     }
 
     private void setInitialText() {
@@ -60,9 +62,38 @@ public class UserHomeFormController {
     }
 
     public void btnViewReports_OnAction(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/viewReportsForm.fxml"));
+            AnchorPane load = fxmlLoader.load();
+            Scene scene = new Scene(load);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.centerOnScreen();
+            stage.sizeToScene();
+            stage.setResizable(false);
+            stage.initOwner(btnRecordAttendance.getScene().getWindow());
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void btnUserProfile_OnAction(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/userProfileForm.fxml"));
+            AnchorPane load = fxmlLoader.load();
+            Scene scene = new Scene(load);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.centerOnScreen();
+            stage.sizeToScene();
+            stage.setResizable(false);
+            stage.initOwner(btnRecordAttendance.getScene().getWindow());
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void btnSignOut_OnAction(ActionEvent actionEvent) throws IOException {
