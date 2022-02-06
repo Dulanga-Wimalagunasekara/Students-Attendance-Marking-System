@@ -9,12 +9,21 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import view.TM.attendanceTM;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -91,7 +100,6 @@ public class ViewReportsFormController {
                         val.getName().toUpperCase().contains(s) | String.valueOf(val.getGrade()).toUpperCase().contains(s) |
                         val.getStatus().toUpperCase().contains(s) | val.getStudentId().toUpperCase().contains(s) |
                         val.getOperator().toUpperCase().contains(s)));
-
                 break;
 
         }
@@ -161,10 +169,42 @@ public class ViewReportsFormController {
                         rst.getString("name"), rst.getInt("grade"), rst.getString("status"),
                         rst.getString("student_id"), rst.getString("username")));
             }
-            this.items=tblItems;
+
         } catch (Throwable e) {
             new Alert(Alert.AlertType.ERROR,"Something went wrong! Please try again!").show();
             e.printStackTrace();
+        }
+    }
+
+    public void btnBackupOnAction(ActionEvent actionEvent) {
+        ObservableList<attendanceTM> tblItems =tblAttendance.getItems();
+
+        HSSFWorkbook book = new HSSFWorkbook();
+        HSSFSheet sheet = book.createSheet();
+
+        HSSFRow row = sheet.createRow(0);
+        for (int i = 0; i <tblAttendance.getColumns().size(); i++) {
+            row.createCell(i).setCellValue(tblAttendance.getColumns().get(i).getText());
+        }
+        for (int i = 0; i <tblItems.size(); i++) {
+            row=sheet.createRow(i+1);
+            for (int j = 0; j < tblAttendance.getColumns().size(); j++) {
+                row.createCell(j).setCellValue(tblAttendance.getColumns().get(j).getCellData(i).toString());
+            }
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showSaveDialog(btnFilter.getScene().getWindow());
+        if (file!=null){
+            Path path = Paths.get(file.getAbsolutePath()+".ods");
+            try {
+                OutputStream outputStream = Files.newOutputStream(path);
+                book.write(outputStream);
+                new Alert(Alert.AlertType.CONFIRMATION,"Backup Success!",ButtonType.OK).show();
+            } catch (IOException e) {
+                new Alert(Alert.AlertType.ERROR,"Something went wrong! Please try again!").show();
+                e.printStackTrace();
+            }
         }
     }
 }

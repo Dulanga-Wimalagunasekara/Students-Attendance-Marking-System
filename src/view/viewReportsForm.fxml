@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="818.0" prefWidth="1300.0" stylesheets="/view/style/ViewReportsFormStyles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewReportsFormController">
+<AnchorPane prefHeight="818.0" prefWidth="1300.0" style="-fx-background-color: white;" stylesheets="/view/style/ViewReportsFormStyles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewReportsFormController">
    <children>
       <TableView fx:id="tblAttendance" layoutX="-2.0" layoutY="172.0" prefHeight="646.0" prefWidth="1307.0" style="-fx-background-color: #d4fff9; -fx-background-radius: 10px;">
          <columns>
@@ -25,18 +25,30 @@
             <TableColumn prefWidth="178.0" text="Name of the Operator" />
          </columns>
       </TableView>
-      <TextField fx:id="txtSearch" layoutX="2.0" layoutY="135.0" prefHeight="26.0" prefWidth="323.0" promptText="Search" />
+      <TextField fx:id="txtSearch" layoutX="3.0" layoutY="128.0" prefHeight="26.0" prefWidth="323.0" promptText="Search" />
       <Label layoutX="511.0" layoutY="37.0" prefHeight="30.0" prefWidth="282.0" text="Attendance Report">
          <font>
             <Font name="System Bold" size="25.0" />
          </font>
       </Label>
-      <ChoiceBox fx:id="choBox" layoutX="338.0" layoutY="135.0" prefWidth="150.0" />
-      <Button fx:id="btnFilter" layoutX="1244.0" layoutY="110.0" mnemonicParsing="false" onAction="#btnFilterOnAction" prefHeight="60.0" prefWidth="44.0">
+      <ChoiceBox fx:id="choBox" layoutX="339.0" layoutY="128.0" prefWidth="150.0" />
+      <Button fx:id="btnFilter" layoutX="1154.0" layoutY="101.0" mnemonicParsing="false" onAction="#btnFilterOnAction" prefHeight="64.0" prefWidth="69.0">
          <graphic>
             <ImageView blendMode="COLOR_BURN" fitHeight="34.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@assets/filter.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <cursor>
+            <Cursor fx:constant="OPEN_HAND" />
+         </cursor>
+      </Button>
+      <Button contentDisplay="TOP" layoutX="1229.0" layoutY="101.0" mnemonicParsing="false" onAction="#btnBackupOnAction" prefHeight="64.0" prefWidth="69.0" text="Backup">
+         <graphic>
+            <ImageView fitHeight="31.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@assets/backup.png" />
                </image>
             </ImageView>
          </graphic>
