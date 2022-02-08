@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="490.0" prefWidth="827.0" style="-fx-background-color: white;" stylesheets="/view/style/ManageUsersFormStyle.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ManageUsersFormController">
+<AnchorPane onKeyPressed="#MngOnKeyPressed" prefHeight="490.0" prefWidth="827.0" style="-fx-background-color: white;" stylesheets="/view/style/ManageUsersFormStyle.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ManageUsersFormController">
    <children>
       <Label layoutX="308.0" layoutY="43.0" prefHeight="35.0" prefWidth="212.0" text="Manage Users ">
          <font>

@@ -8,6 +8,8 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import okhttp3.*;
@@ -240,4 +242,9 @@ public class RecordAttendanceFormController {
         }
     }
 
+    public void RecOnKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
+            ((Stage)btnIn.getScene().getWindow()).close();
+        }
+    }
 }

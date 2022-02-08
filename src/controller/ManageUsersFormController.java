@@ -5,11 +5,13 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 import view.TM.userTM;
 
 
 import java.sql.*;
-import java.util.Collections;
 import java.util.Optional;
 
 public class ManageUsersFormController {
@@ -228,5 +230,11 @@ public class ManageUsersFormController {
             return true;
         }
 
+    }
+
+    public void MngOnKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
+            ((Stage)btnAddNewUser.getScene().getWindow()).close();
+        }
     }
 }

@@ -3,6 +3,7 @@ package controller;
 import db.DBConnection;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import security.SecurityContextHolder;
@@ -68,6 +69,7 @@ public class UserProfileFormController {
         }else {
             disableControls(false);
             txtUser.setDisable(true);
+            txtPassword.clear();
             btnChange.setStyle("-fx-background-color: #ff7373");
             btnChange.setText("Update");
         }
@@ -97,4 +99,9 @@ public class UserProfileFormController {
         }
 
     }
+
+    public void userProbtnOnKeyPressed(KeyEvent keyEvent) {
+        ((Stage)btnChange.getScene().getWindow()).close();
+    }
+
 }

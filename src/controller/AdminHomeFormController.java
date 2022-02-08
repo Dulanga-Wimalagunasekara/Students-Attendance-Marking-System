@@ -5,11 +5,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import security.SecurityContextHolder;
+import sun.awt.X11.XKeyEvent;
 
 import java.io.IOException;
+import java.security.Key;
 
 public class AdminHomeFormController {
     public Label lblHover;
@@ -59,6 +63,7 @@ public class AdminHomeFormController {
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.centerOnScreen();
+            stage.setTitle("Admin Home: Manage Users");
             stage.sizeToScene();
             stage.setResizable(false);
             stage.initOwner(btnRecordAttendance.getScene().getWindow());
@@ -80,6 +85,7 @@ public class AdminHomeFormController {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.sizeToScene();
+        stage.setTitle("Student Attendance System: Log In");
         stage.centerOnScreen();
         stage.show();
         ((Stage)btnSignOut.getScene().getWindow()).close();
@@ -94,6 +100,7 @@ public class AdminHomeFormController {
             stage.setScene(scene);
             stage.centerOnScreen();
             stage.sizeToScene();
+            stage.setTitle("Admin Home: Record Attendance");
             stage.setResizable(false);
             stage.initOwner(btnRecordAttendance.getScene().getWindow());
             stage.show();
@@ -112,6 +119,7 @@ public class AdminHomeFormController {
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.centerOnScreen();
+            stage.setTitle("Admin Home: View Reports");
             stage.sizeToScene();
             stage.setResizable(false);
             stage.initOwner(btnRecordAttendance.getScene().getWindow());
@@ -131,6 +139,7 @@ public class AdminHomeFormController {
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.centerOnScreen();
+            stage.setTitle("Admin Home: User Profile");
             stage.sizeToScene();
             stage.setResizable(false);
             stage.initOwner(btnRecordAttendance.getScene().getWindow());
@@ -141,4 +150,26 @@ public class AdminHomeFormController {
         }
     }
 
+    public void btnOnKeyPressedOnAction(KeyEvent keyEvent) {
+        switch (keyEvent.getCode()) {
+            case F1:
+                btnRecordAttendance.fire();
+                break;
+            case F2:
+                btnViewReports.fire();
+                break;
+            case F3:
+                btnUserProfile.fire();
+                break;
+            case F4:
+                btnManageUsers.fire();
+                break;
+            case F5:
+                btnBackupRestore.fire();
+                break;
+            case F12:
+                btnSignOut.fire();
+                break;
+        }
+    }
 }

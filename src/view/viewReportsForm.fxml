@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="818.0" prefWidth="1300.0" style="-fx-background-color: white;" stylesheets="/view/style/ViewReportsFormStyles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewReportsFormController">
+<AnchorPane onKeyPressed="#viewRepbtnOnKeyPressed" prefHeight="818.0" prefWidth="1300.0" style="-fx-background-color: white;" stylesheets="/view/style/ViewReportsFormStyles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewReportsFormController">
    <children>
       <TableView fx:id="tblAttendance" layoutX="-2.0" layoutY="172.0" prefHeight="646.0" prefWidth="1307.0" style="-fx-background-color: #d4fff9; -fx-background-radius: 10px;">
          <columns>
@@ -26,7 +26,7 @@
          </columns>
       </TableView>
       <TextField fx:id="txtSearch" layoutX="3.0" layoutY="128.0" prefHeight="26.0" prefWidth="323.0" promptText="Search" />
-      <Label layoutX="289.0" layoutY="30.0" prefHeight="30.0" prefWidth="728.0" text="Students' Attendance System - Attendance Report">
+      <Label layoutX="289.0" layoutY="44.0" prefHeight="30.0" prefWidth="728.0" text="Students' Attendance System - Attendance Report">
          <font>
             <Font name="System Bold" size="25.0" />
          </font>

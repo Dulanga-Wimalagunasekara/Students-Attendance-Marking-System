@@ -45,9 +45,12 @@ public class LoginFormController {
                     Stage stage = new Stage();
                     stage.setScene(scene);
                     stage.sizeToScene();
+                    stage.setTitle(path.equals("/view/AdminHomeForm.fxml") ? "Student Attendance System: Admin Home" : "Student Attendance System: User Home" );
                     stage.centerOnScreen();
                     stage.setResizable(false);
                     stage.show();
+
+
                     ((Stage) btnSignIn.getScene().getWindow()).close();
                 }else{
                     new Alert(Alert.AlertType.WARNING,"Invalid username or password.Please Try Again!").show();

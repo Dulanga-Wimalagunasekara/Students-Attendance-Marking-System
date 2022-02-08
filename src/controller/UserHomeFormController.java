@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import security.SecurityContextHolder;
@@ -51,6 +52,7 @@ public class UserHomeFormController {
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.centerOnScreen();
+            stage.setTitle("User Home: Record Attendance");
             stage.sizeToScene();
             stage.setResizable(false);
             stage.initOwner(btnRecordAttendance.getScene().getWindow());
@@ -70,6 +72,7 @@ public class UserHomeFormController {
             stage.setScene(scene);
             stage.centerOnScreen();
             stage.sizeToScene();
+            stage.setTitle("User Home: View Reports");
             stage.setResizable(false);
             stage.initOwner(btnRecordAttendance.getScene().getWindow());
             stage.show();
@@ -88,6 +91,7 @@ public class UserHomeFormController {
             stage.setScene(scene);
             stage.centerOnScreen();
             stage.sizeToScene();
+            stage.setTitle("User Home: User Profile");
             stage.setResizable(false);
             stage.initOwner(btnRecordAttendance.getScene().getWindow());
             stage.show();
@@ -104,7 +108,25 @@ public class UserHomeFormController {
         stage1.setResizable(false);
         stage1.sizeToScene();
         stage1.centerOnScreen();
+        stage1.setTitle("Student Attendance System: Log In");
         stage1.show();
         ((Stage)btnSignOut.getScene().getWindow()).close();
+    }
+
+    public void btnOnKeyPressedOnAction(KeyEvent keyEvent) {
+        switch (keyEvent.getCode()) {
+            case F1:
+                btnRecordAttendance.fire();
+                break;
+            case F2:
+                btnViewReports.fire();
+                break;
+            case F3:
+                btnUserProfile.fire();
+                break;
+            case F12 :
+                btnSignOut.fire();
+                break;
+        }
     }
 }

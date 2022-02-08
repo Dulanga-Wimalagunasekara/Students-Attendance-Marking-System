@@ -8,8 +8,10 @@ public class AlertFormController {
     public Button btnCallPolice;
 
     public void btnProceed_OnAction(ActionEvent actionEvent) {
+
     }
 
     public void btnCallPolice_OnAction(ActionEvent actionEvent) {
+
     }
 }

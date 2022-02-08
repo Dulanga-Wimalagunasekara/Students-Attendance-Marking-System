@@ -9,6 +9,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -205,6 +207,12 @@ public class ViewReportsFormController {
                 new Alert(Alert.AlertType.ERROR,"Something went wrong! Please try again!").show();
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void viewRepbtnOnKeyPressed(KeyEvent keyEvent) {
+        if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
+            ((Stage)tblAttendance.getScene().getWindow()).close();
         }
     }
 }
