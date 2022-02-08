@@ -212,7 +212,7 @@ public class ViewReportsFormController {
 
     public void viewRepbtnOnKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
-            ((Stage)tblAttendance.getScene().getWindow()).close();
+            ((Stage)btnFilter.getScene().getWindow()).close();
         }
     }
 }

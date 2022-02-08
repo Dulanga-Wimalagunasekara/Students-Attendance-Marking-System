@@ -7,7 +7,7 @@ USE dep8_student_attendance;
 
 CREATE TABLE student
 (
-    id VARCHAR(30) PRIMARY KEY,
+    id VARCHAR(30) PRIMARY KEY ,
     name VARCHAR(100) NOT NULL,
     picture LONGBLOB NOT NULL,
     contact VARCHAR(15) NOT NULL,

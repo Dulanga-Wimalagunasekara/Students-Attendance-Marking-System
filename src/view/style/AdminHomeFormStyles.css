@@ -1,4 +1,9 @@
 .button:hover{
-    -fx-background-color: #e9f5ff !important;
+    -fx-background-color: #6bf0ff !important;
+    -fx-background-radius: 20px;
+}
+
+#btnAddStudents:hover{
+    -fx-background-color: #95ff80 !important;
     -fx-background-radius: 20px;
 }

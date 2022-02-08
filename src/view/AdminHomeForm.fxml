@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane onKeyPressed="#btnOnKeyPressedOnAction" prefHeight="541.0" prefWidth="488.0" style="-fx-background-color: white;" stylesheets="@style/AdminHomeFormStyles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AdminHomeFormController">
+<AnchorPane onKeyPressed="#btnOnKeyPressedOnAction" prefHeight="673.0" prefWidth="488.0" style="-fx-background-color: white;" stylesheets="@style/AdminHomeFormStyles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AdminHomeFormController">
     <children>
         <HBox alignment="CENTER" layoutX="15.0" layoutY="100.0" spacing="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="120.0">
             <children>
@@ -142,11 +142,26 @@
             <font>
                 <Font name="Ubuntu Light" size="13.0" />
             </font></Label>
-        <Label alignment="CENTER" layoutX="-1.0" layoutY="517.0" text="Copyright © 2022 Dulanga Wimalagunasekara. All Rights Reserved." AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="1.0">
+        <Label alignment="CENTER" layoutX="-1.0" layoutY="644.0" text="Copyright © 2022 Dulanga Wimalagunasekara. All Rights Reserved." AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="1.0">
             <font>
-                <Font name="Ubuntu" size="11.0" />
+                <Font name="Ubuntu Bold Italic" size="11.0" />
             </font>
         </Label>
         <Label fx:id="lblHover" alignment="CENTER" layoutX="18.0" layoutY="88.0" prefHeight="16.0" prefWidth="449.0" text="Select an option to continue" textAlignment="CENTER" />
+      <Button fx:id="btnAddStudents" accessibleText="Click to manage the user profile" alignment="CENTER" contentDisplay="TOP" graphicTextGap="15.0" layoutX="57.0" layoutY="510.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnAddStudentsOnAction" prefHeight="113.0" prefWidth="374.0" style="-fx-background-color: white;" text="[F6] Add Students" AnchorPane.leftAnchor="57.0" AnchorPane.rightAnchor="57.0">
+         <graphic>
+            <ImageView fitHeight="67.0" fitWidth="71.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@assets/adduser.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <font>
+            <Font name="Ubuntu" size="16.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
     </children>
 </AnchorPane>

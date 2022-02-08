@@ -5,15 +5,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
+
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import security.SecurityContextHolder;
-import sun.awt.X11.XKeyEvent;
+
 
 import java.io.IOException;
-import java.security.Key;
 
 public class AdminHomeFormController {
     public Label lblHover;
@@ -24,6 +23,7 @@ public class AdminHomeFormController {
     public Button btnViewReports;
     public Button btnRecordAttendance;
     public Label lblPrincipal;
+    public Button btnAddStudents;
 
     String initialText;
     public void initialize(){
@@ -35,6 +35,7 @@ public class AdminHomeFormController {
         btnManageUsers.setOnMouseEntered(event ->setHover((Button) event.getSource()));
         btnBackupRestore.setOnMouseEntered(event ->setHover((Button) event.getSource()));
         btnSignOut.setOnMouseEntered(event ->setHover((Button) event.getSource()));
+        btnAddStudents.setOnMouseEntered(event -> setHover((Button) event.getSource()));
 
         btnRecordAttendance.setOnMouseExited(event ->setInitialText());
         btnViewReports.setOnMouseExited(event ->setInitialText());
@@ -42,6 +43,7 @@ public class AdminHomeFormController {
         btnManageUsers.setOnMouseExited(event ->setInitialText());
         btnBackupRestore.setOnMouseExited(event ->setInitialText());
         btnSignOut.setOnMouseExited(event ->setInitialText());
+        btnAddStudents.setOnMouseExited(event -> setInitialText());
 
         lblPrincipal.setText("Welcome "+SecurityContextHolder.getPrincipal().getName()+"!");
 
@@ -167,9 +169,23 @@ public class AdminHomeFormController {
             case F5:
                 btnBackupRestore.fire();
                 break;
+            case F6:
+                btnAddStudents.fire();
+                break;
             case F12:
                 btnSignOut.fire();
                 break;
         }
+    }
+
+    public void btnAddStudentsOnAction(ActionEvent actionEvent) throws IOException {
+        Stage stage = new Stage();
+        AnchorPane load = FXMLLoader.load(getClass().getResource("/view/AddStudentsForm.fxml"));
+        stage.setScene(new Scene(load));
+        stage.sizeToScene();
+        stage.centerOnScreen();
+        stage.setResizable(false);
+        stage.initOwner(btnRecordAttendance.getScene().getWindow());
+        stage.show();
     }
 }
