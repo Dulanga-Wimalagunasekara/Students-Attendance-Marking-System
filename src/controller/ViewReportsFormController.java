@@ -204,7 +204,7 @@ public class ViewReportsFormController {
                 outputStream.close();
                 new Alert(Alert.AlertType.CONFIRMATION,"Backup Success!",ButtonType.OK).show();
             } catch (IOException e) {
-                new Alert(Alert.AlertType.ERROR,"Something went wrong! Please try again!").show();
+                new Alert(Alert.AlertType.ERROR,"Something went wrong! Please try again!",ButtonType.OK).show();
                 e.printStackTrace();
             }
         }

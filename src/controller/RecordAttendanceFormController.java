@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.sql.Connection;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -34,6 +35,7 @@ public class RecordAttendanceFormController {
     public Label lblStudentName;
     public ToggleButton btnIn;
     public ToggleButton btnOut;
+    public ToggleButton btnAutoMode;
     private PreparedStatement stm;
 
     public void initialize() {
@@ -58,7 +60,7 @@ public class RecordAttendanceFormController {
 
         txtStudentID.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!txtStudentID.getText().isEmpty()) {
-                if (!btnIn.isSelected() && !btnOut.isSelected()) {
+                if (!btnIn.isSelected() && !btnOut.isSelected() && !btnAutoMode.isSelected()) {
                     txtStudentID.clear();
                     new Alert(Alert.AlertType.WARNING, "Please Select an Option(IN/OUT) to Continue.").show();
                 }
@@ -87,6 +89,16 @@ public class RecordAttendanceFormController {
             txtStudentID.requestFocus();
         });
 
+        btnAutoMode.selectedProperty().addListener(observable -> {
+            txtStudentID.selectAll();
+            if (btnAutoMode.isSelected()) {
+                btnAutoMode.setStyle("-fx-background-color: lightblue");
+            } else {
+                btnAutoMode.setStyle("-fx-background-color:  #5291ff");
+            }
+            txtStudentID.requestFocus();
+        });
+
         updateLabels();
 
     }
@@ -108,7 +120,7 @@ public class RecordAttendanceFormController {
                 lblStudentName.setText(rst.getString("name").toUpperCase());
                 InputStream is = rst.getBlob("picture").getBinaryStream();
                 imgProfile.setImage(new Image(is));
-                insertIntoDatabase(rst.getString("name"),rst.getString("id"),rst.getString("grade"));
+                insertIntoDatabase(rst.getString("name"), rst.getString("id"), rst.getString("grade"));
                 txtStudentID.selectAll();
             } else {
                 new Alert(Alert.AlertType.ERROR, "Invalid Student ID, Try again!", ButtonType.OK).show();
@@ -124,7 +136,7 @@ public class RecordAttendanceFormController {
         }
     }
 
-    private void sendSMS(String id,LocalDateTime dateTime) {
+    private void sendSMS(String id, LocalDateTime dateTime) {
 
         new Thread(() -> {
             Connection connection = DBConnection.getInstance().getConnection();
@@ -133,20 +145,20 @@ public class RecordAttendanceFormController {
             try {
                 connection.setAutoCommit(false);
                 PreparedStatement stm1 = connection.prepareStatement("SELECT status FROM attendance WHERE student_id=? ORDER BY id DESC LIMIT 1");
-                stm1.setString(1,id);
+                stm1.setString(1, id);
                 ResultSet rstAttendance = stm1.executeQuery();
                 PreparedStatement stm2 = connection.prepareStatement("SELECT name,contact FROM student WHERE id=?");
-                stm2.setString(1,id);
+                stm2.setString(1, id);
                 ResultSet rstStudent = stm2.executeQuery();
                 connection.commit();
-                if (rstStudent.next() && rstAttendance.next()){
-                    if (btnIn.isSelected()){
-                        message=rstStudent.getString("name")+" is attending to the class. AT: "+dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))+" Status: "+rstAttendance.getString("status");
-                    }else{
-                        message=rstStudent.getString("name")+" is leaving the class. AT: "+dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))+" Status: "+rstAttendance.getString("status");
+                if (rstStudent.next() && rstAttendance.next()) {
+                    if (rstAttendance.getString("status").equals("IN")) {
+                        message = rstStudent.getString("name") + " is attending to the class. AT: " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Status: " + rstAttendance.getString("status");
+                    } else {
+                        message = rstStudent.getString("name") + " is leaving the class. AT: " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Status: " + rstAttendance.getString("status");
                     }
-                    contact=rstStudent.getString("contact");
-                }else {
+                    contact = rstStudent.getString("contact");
+                } else {
                     throw new RuntimeException("Something went wrong. Please try again.");
                 }
 
@@ -154,7 +166,7 @@ public class RecordAttendanceFormController {
                 e.printStackTrace();
                 rollbackConnection(connection);
                 return;
-            }finally {
+            } finally {
                 try {
                     connection.setAutoCommit(true);
                 } catch (SQLException e) {
@@ -164,7 +176,7 @@ public class RecordAttendanceFormController {
             System.out.println(message);
             System.out.println(contact);
 
-            String content ="{\n\"message\":\""+message+"\",\n\"phoneNumber\":\""+contact+"\"\n}";
+            String content = "{\n\"message\":\"" + message + "\",\n\"phoneNumber\":\"" + contact + "\"\n}";
             System.out.println(content);
 
             OkHttpClient client = new OkHttpClient().newBuilder()
@@ -182,42 +194,74 @@ public class RecordAttendanceFormController {
                 System.out.println(response);
             } catch (IOException e) {
                 e.printStackTrace();
-                new Alert(Alert.AlertType.WARNING,"SMS Sending Failed!. Please try again",ButtonType.OK).show();
+                new Alert(Alert.AlertType.WARNING, "SMS Sending Failed!. Please try again", ButtonType.OK).show();
             }
         }).start();
     }
 
     private void rollbackConnection(Connection connection) {
-            try {
-                connection.rollback();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void insertIntoDatabase(String name, String id, String grade) throws SQLException {
 
         Connection connection = DBConnection.getInstance().getConnection();
         try {
+            String status = checkStatus(id);
             PreparedStatement stm2 = connection.prepareStatement("INSERT INTO attendance (date, status, student_id, username,name,grade) VALUES (?,?,?,?,?,?)");
             LocalDateTime dateTime = LocalDateTime.now();
-            stm2.setObject(1,dateTime);
-            stm2.setString(2, btnIn.isSelected() ? "IN" : "OUT");
-            stm2.setString(3,id);
-            stm2.setString(4,SecurityContextHolder.getPrincipal().getUsername());
-            stm2.setString(5,name);
-            stm2.setString(6,grade);
+            stm2.setObject(1, dateTime);
+            stm2.setString(2, status);
+            stm2.setString(3, id);
+            stm2.setString(4, SecurityContextHolder.getPrincipal().getUsername());
+            stm2.setString(5, name);
+            stm2.setString(6, grade);
 
             int i = stm2.executeUpdate();
             if (i != 1) {
                 throw new RuntimeException("Failed to execute the statement");
             }
             updateLabels();
-//            sendSMS(txtStudentID.getText(),dateTime);
+            sendSMS(txtStudentID.getText(),dateTime);
 
         } catch (Throwable e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Failed to initialize the database!", ButtonType.OK).show();
+        }
+    }
+
+    private String checkStatus(String id) {
+        String format = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        if (btnIn.isSelected()) {
+            return "IN";
+        } else if (btnOut.isSelected()) {
+            return "OUT";
+        } else {
+            Connection connection = DBConnection.getInstance().getConnection();
+            try {
+                PreparedStatement stm = connection.prepareStatement("SELECT status FROM attendance WHERE student_id=? AND date BETWEEN ? AND ? ORDER BY id DESC LIMIT 1");
+                stm.setString(1, id);
+                stm.setString(2, format + " 00:00:00");
+                stm.setString(3, format + " 23:59:59");
+                ResultSet resultSet = stm.executeQuery();
+                if (resultSet.next()) {
+                    if (resultSet.getString("status").equals("IN")) {
+                        return "OUT";
+                    } else {
+                        return "IN";
+                    }
+                } else {
+                    return "IN";
+                }
+            } catch (Throwable e) {
+                new Alert(Alert.AlertType.ERROR, "Something went wrong with Auto Mode!", ButtonType.OK).show();
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 
@@ -226,16 +270,16 @@ public class RecordAttendanceFormController {
         try {
             PreparedStatement stm = connection.prepareStatement("SELECT * FROM attendance ORDER BY id DESC LIMIT 1");
             ResultSet rst = stm.executeQuery();
-            if (rst.next()){
+            if (rst.next()) {
                 PreparedStatement stm2 = connection.prepareStatement("SELECT name FROM student WHERE id=?");
-                stm2.setString(1,rst.getString("student_id"));
+                stm2.setString(1, rst.getString("student_id"));
                 ResultSet rst2 = stm2.executeQuery();
                 rst2.next();
-                lblID.setText("ID: "+rst.getString("student_id"));
-                lblName.setText("Name: "+rst2.getString("name"));
+                lblID.setText("ID: " + rst.getString("student_id"));
+                lblName.setText("Name: " + rst2.getString("name"));
                 Object date = rst.getObject("date");
-                LocalDateTime dateTime= (LocalDateTime) date;
-                lblStatus.setText(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) +" - "+rst.getString("status"));
+                LocalDateTime dateTime = (LocalDateTime) date;
+                lblStatus.setText(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " - " + rst.getString("status"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -243,8 +287,8 @@ public class RecordAttendanceFormController {
     }
 
     public void RecOnKeyPressed(KeyEvent keyEvent) {
-        if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
-            ((Stage)btnIn.getScene().getWindow()).close();
+        if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
+            ((Stage) btnIn.getScene().getWindow()).close();
         }
     }
 }

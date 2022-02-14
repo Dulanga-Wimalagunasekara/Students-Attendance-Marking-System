@@ -84,6 +84,12 @@ public class AddStudentsFormController {
             btnDeleteStudent.requestFocus();
         });
 
+        tblStudents.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue==null){
+                tblStudents.getSelectionModel().clearSelection();
+            }
+        });
+
     }
 
     private void filterList() {
@@ -153,27 +159,35 @@ public class AddStudentsFormController {
         btnBrowse.setDisable(val);
     }
 
-    public void btnDeleteStudent_OnAction(ActionEvent actionEvent) {
+    public void btnDeleteStudent_OnAction(ActionEvent actionEvent) throws SQLException {
         studentTM selectedItem = tblStudents.getSelectionModel().getSelectedItem();
         Connection connection = DBConnection.getInstance().getConnection();
         ObservableList<studentTM> items = tblStudents.getItems();
         try {
+            connection.setAutoCommit(false);
+            PreparedStatement stm1 = connection.prepareStatement("DELETE FROM attendance WHERE student_id=?");
+            stm1.setString(1,selectedItem.getStId());
             PreparedStatement stm = connection.prepareStatement("DELETE FROM student WHERE id=?");
             stm.setString(1,selectedItem.getStId());
             Optional<ButtonType> buttonType = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete the student",ButtonType.YES,ButtonType.NO).showAndWait();
             if (buttonType.get().equals(ButtonType.YES)){
+                stm1.executeUpdate();
                 int i = stm.executeUpdate();
                 if (i!=1){
                     throw new RuntimeException("Something went wrong! Please try again!");
                 }else {
+                    connection.commit();
                     new Alert(Alert.AlertType.CONFIRMATION,"Deleted Successfully!",ButtonType.OK).show();
                     loadAllStudents();
                 }
             }
 
-        } catch (SQLException e) {
+        } catch (Throwable e) {
+            connection.rollback();
             new Alert(Alert.AlertType.ERROR,"Something went wrong! Please try again!",ButtonType.OK).show();
             e.printStackTrace();
+        }finally {
+            connection.setAutoCommit(true);
         }
         tblStudents.getSelectionModel().clearSelection();
         btnDeleteStudent.setDisable(true);
@@ -251,7 +265,9 @@ public class AddStudentsFormController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images",
                 "*.jpg", "*.png"));
         File file = fileChooser.showOpenDialog(btnNewStudent.getScene().getWindow());
-        txtPicture.setText(file.getAbsolutePath());
+        if (file!=null){
+            txtPicture.setText(file.getAbsolutePath());
+        }
     }
 
     public void btnNewStudent_OnAction(ActionEvent actionEvent) {

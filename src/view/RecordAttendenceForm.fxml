@@ -52,6 +52,11 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </ToggleButton>
+            <ToggleButton fx:id="btnAutoMode" mnemonicParsing="false" prefHeight="38.0" prefWidth="107.0" style="-fx-background-color: #5291ff; -fx-text-fill: white;" text="Auto Mode" toggleGroup="$abc">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </ToggleButton>
          </children>
         </FlowPane>
         <Label fx:id="lblDate" alignment="CENTER" layoutX="121.0" layoutY="408.0" prefHeight="20.0" prefWidth="273.0" text="2022-01-25 12:15 PM" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0">
