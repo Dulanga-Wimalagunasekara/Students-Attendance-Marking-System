@@ -72,16 +72,37 @@ public class AddStudentsFormController {
         });
 
         txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!tblStudents.getSelectionModel().isEmpty()){
+                clearFields();
+                tblStudents.getSelectionModel().clearSelection();
+            }
             if (newValue != null) {
                 filterList();
+                txtSearch.requestFocus();
             } else {
                 tblStudents.setItems(items);
             }
         });
 
         tblStudents.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            btnDeleteStudent.setDisable(false);
-            btnDeleteStudent.requestFocus();
+            if (newValue!=null){
+                clearFields();
+                disableControls(true);
+                btnSaveStudent.setText("Update");
+                btnSaveStudent.setDisable(false);
+                txtContact.setText(newValue.getContact());
+                txtContact.setDisable(false);
+                txtName.setText(newValue.getName());
+                txtName.setDisable(false);
+                txtPicture.setText("[PICTURE]");
+                txtPicture.setDisable(false);
+                btnBrowse.setDisable(false);
+                btnDeleteStudent.setDisable(false);
+                btnDeleteStudent.requestFocus();
+            }else{
+                btnSaveStudent.setText("Save Student");
+                disableControls(true);
+            }
         });
 
         tblStudents.focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -271,6 +292,8 @@ public class AddStudentsFormController {
     }
 
     public void btnNewStudent_OnAction(ActionEvent actionEvent) {
+        tblStudents.getSelectionModel().clearSelection();
+        clearFields();
         disableControls(false);
         btnDeleteStudent.setDisable(true);
         btnNewStudent.setDisable(true);
