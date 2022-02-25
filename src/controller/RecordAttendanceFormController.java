@@ -18,6 +18,9 @@ import security.SecurityContextHolder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.*;
 import java.sql.Connection;
 import java.time.LocalDate;
@@ -173,24 +176,20 @@ public class RecordAttendanceFormController {
                     e.printStackTrace();
                 }
             }
-            System.out.println(message);
-            System.out.println(contact);
 
             String content = "{\n\"message\":\"" + message + "\",\n\"phoneNumber\":\"" + contact + "\"\n}";
-            System.out.println(content);
 
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
-            MediaType mediaType = MediaType.parse("application/json");
-            RequestBody body = RequestBody.create(mediaType, content);
-            Request request = new Request.Builder()
-                    .url("https://api.smshub.lk/api/v1/send/single")
-                    .method("POST", body)
-                    .addHeader("Authorization", "TOKEN HERE")
-                    .addHeader("Content-Type", "application/json")
-                    .build();
             try {
-                Response response = client.newCall(request).execute();
+                URL url = new URL("https://api.smshub.lk/api/v2/send/single");
+                HttpURLConnection connection1 = (HttpURLConnection) url.openConnection();
+                connection1.setRequestMethod("POST");
+                connection1.setRequestProperty("Content-Type","application/json");
+                connection1.setRequestProperty("Authorization","A4n2dulq9EZvFVNHsO4oufAqBtQTr4tj7WZYgkqskF9L9EQrcUhSm10OtBw3UOnVGoScqBmXIIKM5eCGsLdyu4CUmWfxwXHM10pMUtGKZ5OPhFSauEXWUqpfq07YW9j2Fu3Hf36uz8ShSVBNHtS9TKInYLRGrveo6a7MO5ftvU4t6Ha5T65wahDEdh1OCkghJclAH1Nj6ExcMm5BOWzseFlMALqIcmKc0xRCd02qhNVbv6WQRBEhlPnnogWG7yWwtxtFF087xkaGlhcyT6dCMXMmJyM6sa7cSNCyxaZA5OK3Oi4PA798pswC9tlvBMbLPPqKxZ3N7pz8U2S9thdMKJyQJsG6FFXBaIlE65fvdnMmvsdQHSx8Enee6utzGigczFUclT6be6RQDqksUPmNdOxlXrU6F3WOjUdZ7v3BodGHyvfW2yh6XsDSpVF7OaYnIbB0kgxUAV55bYpy6UdrK2j2QTwlEvPcKg59eZen9wdLtwJjEPxCXW2hEQeSXgelpB2rgvAGbUnB9ViqMJjCVc0ovA4sArNs0stcR4Qiw0o2nyhcL51SQb8Adm8axh2m2Tk49tdJzZu8hLB2jZ1mmTMcQwQqr1aeU7mv8Uh2S79wOFBKA2yhTCf1kG73KgaK8ieltQVRBNeJwR011gT5k72udiS3COQHNBE03WDfhdobVpT9oU7d5wLmGMh30AsAsNrq9beLWo3qU12hzfYamjbyWyDPlru68FFciVpAG1jo4oYCfz8lUCy1UPv6CL0MuTsm0uNfbxnIy5MttCfFHJQRXHDivPFHjRSaS0mVv8AmXzRtjBIlM4oM8uJohBZm4lZLeUTnXHChANxolPo3NOMkjbsz826uuraeyzuCaISGdt8C9GpoV8vSmjvBdDI4OW7ZcwBr1TJsO3sAZY9FpbyKprhAqRfzIxtNqpJuQgpVBnVCQNDIUkPWwzhjGhi9ozhaD4YSOjo3lU3zluzvS8chT8fQJf0aCfEqU4rF2Cesmto3ROTibGFfu1XxjkAv");
+
+                connection1.setDoOutput(true);
+                connection1.getOutputStream().write(content.getBytes());
+                connection1.getOutputStream().close();
+                int response = connection1.getResponseCode();
                 System.out.println(response);
             } catch (IOException e) {
                 e.printStackTrace();

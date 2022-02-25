@@ -97,6 +97,8 @@ public class AddStudentsFormController {
                 txtPicture.setText("[PICTURE]");
                 txtPicture.setDisable(false);
                 btnBrowse.setDisable(false);
+                choGrade.setValue(String.valueOf(newValue.getGrade()));
+                txtId.setText(newValue.getStId());
                 btnDeleteStudent.setDisable(false);
                 btnDeleteStudent.requestFocus();
             }else{
@@ -209,44 +211,84 @@ public class AddStudentsFormController {
             e.printStackTrace();
         }finally {
             connection.setAutoCommit(true);
+            tblStudents.getSelectionModel().clearSelection();
+            clearFields();
+            disableControls(true);
+            btnNewStudent.setDisable(false);
         }
-        tblStudents.getSelectionModel().clearSelection();
-        btnDeleteStudent.setDisable(true);
     }
 
     public void btnSaveStudent_OnAction(ActionEvent actionEvent) {
-        if (Isvalidated()) {
-            String value = choGrade.getSelectionModel().getSelectedItem();
-            Connection connection = DBConnection.getInstance().getConnection();
-            Path path = Paths.get(txtPicture.getText());
-            try {
-                byte[] bytes = Files.readAllBytes(path);
-                PreparedStatement stm = connection.prepareStatement("INSERT INTO student (id, name, picture,contact,grade) VALUES (?,?,?,?,?)");
-                stm.setString(1, txtId.getText());
-                stm.setString(2, txtName.getText());
-                stm.setBlob(3, new SerialBlob(bytes));
-                stm.setString(4, txtContact.getText());
-                stm.setInt(5, Integer.parseInt(value));
-                int i = stm.executeUpdate();
-                if (i == 1) {
-                    new Alert(Alert.AlertType.CONFIRMATION, "Added Successfully!", ButtonType.OK).show();
+        if (btnSaveStudent.getText().equals("Save Student")){
+            if (Isvalidated()) {
+                String value = choGrade.getSelectionModel().getSelectedItem();
+                Connection connection = DBConnection.getInstance().getConnection();
+                Path path = Paths.get(txtPicture.getText());
+                try {
+                    byte[] bytes = Files.readAllBytes(path);
+                    PreparedStatement stm = connection.prepareStatement("INSERT INTO student (id, name, picture,contact,grade) VALUES (?,?,?,?,?)");
+                    stm.setString(1, txtId.getText());
+                    stm.setString(2, txtName.getText());
+                    stm.setBlob(3, new SerialBlob(bytes));
+                    stm.setString(4, txtContact.getText());
+                    stm.setInt(5, Integer.parseInt(value));
+                    int i = stm.executeUpdate();
+                    if (i == 1) {
+                        new Alert(Alert.AlertType.CONFIRMATION, "Added Successfully!", ButtonType.OK).show();
+                    }
+
+                    items.add(new studentTM(txtId.getText(), Integer.parseInt(choGrade.getValue()),
+                            txtName.getText(), bytes, txtContact.getText()));
+                    tblStudents.refresh();
+
+                } catch (SQLException | IOException e) {
+                    e.printStackTrace();
+                    new Alert(Alert.AlertType.ERROR, "Something went wrong! Please try again!").show();
                 }
+                clearFields();
+                choGrade.setValue(value);
+                btnNewStudent.setDisable(false);
+                txtName.requestFocus();
 
-                items.add(new studentTM(txtId.getText(), Integer.parseInt(choGrade.getValue()),
-                        txtName.getText(), bytes, txtContact.getText()));
-                tblStudents.refresh();
-
-            } catch (SQLException | IOException e) {
-                e.printStackTrace();
-                new Alert(Alert.AlertType.ERROR, "Something went wrong! Please try again!").show();
             }
-            clearFields();
-            choGrade.setValue(value);
-            btnNewStudent.setDisable(false);
-            txtName.requestFocus();
-
+        }else {
+            if (Isvalidated()){
+                try {
+                    String sql;
+                    byte[] bytes=null;
+                    if (txtPicture.getText().equals("[PICTURE]")){
+                        sql="UPDATE student SET name=?,contact=? WHERE id=?";
+                    }else {
+                        Path path = Paths.get(txtPicture.getText());
+                        bytes = Files.readAllBytes(path);
+                        sql="UPDATE student SET name=?,contact=?,picture=? WHERE id=?";
+                    }
+                    Connection connection = DBConnection.getInstance().getConnection();
+                    PreparedStatement stm = connection.prepareStatement(sql);
+                    stm.setString(1,txtName.getText());
+                    stm.setString(2,txtContact.getText());
+                    if (!txtPicture.getText().equals("[PICTURE]") && bytes!=null){
+                        stm.setBlob(3,new SerialBlob(bytes));
+                        stm.setString(4,txtId.getText());
+                    }else {
+                        stm.setString(3,txtId.getText());
+                    }
+                    int i = stm.executeUpdate();
+                    if (i!=1){
+                        throw new RuntimeException("Update Failed!");
+                    }else {
+                        new Alert(Alert.AlertType.CONFIRMATION,"Updated Successfully!",ButtonType.OK).show();
+                    }
+                } catch (Throwable e) {
+                    new Alert(Alert.AlertType.ERROR,"Update Failed! Please try again!",ButtonType.OK).show();
+                    e.printStackTrace();
+                }finally {
+                    tblStudents.getSelectionModel().clearSelection();
+                    clearFields();
+                    loadAllStudents();
+                }
+            }
         }
-
     }
 
     private void clearFields() {
