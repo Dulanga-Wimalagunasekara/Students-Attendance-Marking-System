@@ -21,9 +21,7 @@ import security.SecurityContextHolder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.sql.*;
 import java.sql.Connection;
 import java.time.LocalDate;
@@ -159,9 +157,9 @@ public class RecordAttendanceFormController {
                 connection.commit();
                 if (rstStudent.next() && rstAttendance.next()) {
                     if (rstAttendance.getString("status").equals("IN")) {
-                        message = rstStudent.getString("name") + " is attending to the Maths class. AT: " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Status: " + rstAttendance.getString("status");
+                        message = rstStudent.getString("name") + " is attending to the Maths class. AT: " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")) + " Status: " + rstAttendance.getString("status");
                     } else {
-                        message = rstStudent.getString("name") + " is leaving the Maths class. AT: " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Status: " + rstAttendance.getString("status");
+                        message = rstStudent.getString("name") + " is leaving the Maths class. AT: " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a")) + " Status: " + rstAttendance.getString("status");
                     }
                     contact = rstStudent.getString("contact");
                 } else {
@@ -187,7 +185,7 @@ public class RecordAttendanceFormController {
                 HttpURLConnection connection1 = (HttpURLConnection) url.openConnection();
                 connection1.setRequestMethod("POST");
                 connection1.setRequestProperty("Content-Type","application/json");
-                connection1.setRequestProperty("Authorization","Token Here");
+                connection1.setRequestProperty("Authorization","TOKEN HERE");
 
                 connection1.setDoOutput(true);
                 connection1.getOutputStream().write(content.getBytes());
@@ -235,7 +233,7 @@ public class RecordAttendanceFormController {
             mediaPlayer.play();
         } catch (Throwable e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Failed to initialize the database!", ButtonType.OK).show();
+            new Alert(Alert.AlertType.ERROR, "Failed to insert to the database!", ButtonType.OK).show();
         }
     }
 

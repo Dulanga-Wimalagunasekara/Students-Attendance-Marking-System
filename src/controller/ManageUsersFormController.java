@@ -46,17 +46,40 @@ public class ManageUsersFormController {
         tblUser.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue!=null){
                 disableControls(true);
-                txtUsername.setText(newValue.getUsername());
-                txtPassword.setText(newValue.getPassword());
-                txtConfirmPassword.setText(newValue.getPassword());
-                txtName.setText(newValue.getName());
-                menuRole.setText(newValue.getRole());
-                btnUpdateRole.setDisable(false);
+                try {
+                    String password=decryptPassword(newValue);
+                    txtUsername.setText(newValue.getUsername());
+                    txtPassword.setText(password);
+                    txtConfirmPassword.setText(password);
+                    txtName.setText(newValue.getName());
+                    menuRole.setText(newValue.getRole());
+                    btnUpdateRole.setDisable(false);
+
+                    newValue.setPassword(password);
+                    tblUser.refresh();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (oldValue!=null){
+                oldValue.setPassword("*********************");
+                tblUser.refresh();
             }
         });
+
         txtPassword.setOnAction(event -> {
             txtConfirmPassword.clear();
         });
+
+    }
+
+    private String decryptPassword(userTM tm) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        PreparedStatement stm = connection.prepareStatement("SELECT password FROM user WHERE username=?");
+        stm.setString(1,tm.getUsername());
+        ResultSet rst = stm.executeQuery();
+        rst.next();
+        return rst.getString("password");
     }
 
     private void disableControls(boolean b) {
@@ -79,9 +102,15 @@ public class ManageUsersFormController {
                 ObservableList<userTM> items = tblUser.getItems();
                 Button button = new Button("Remove");
                 userTM userTM = new userTM(rst.getString("username"), rst.getString("name"),
-                        rst.getString("password"), rst.getString("role"), button);
+                        "*********************", rst.getString("role"), button);
                 items.add(userTM);
-                button.setOnAction(event -> removeUserOnAction(userTM));
+                button.setOnAction(event -> {
+                    try {
+                        removeUserOnAction(userTM);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                });
 
             }
         } catch (SQLException e) {
@@ -89,8 +118,20 @@ public class ManageUsersFormController {
         }
     }
 
-    private void removeUserOnAction(userTM tm) {
+    private void removeUserOnAction(userTM tm) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
+        if (tm.getRole().equals("ADMIN")){
+            PreparedStatement stm1 = connection.prepareStatement("SELECT role FROM user WHERE role='ADMIN'");
+            ResultSet resultSet = stm1.executeQuery();
+            int i=0;
+            while (resultSet.next()){
+                i++;
+            }
+            if (i==1){
+                new Alert(Alert.AlertType.WARNING,"Can't Remove. At least one ADMIN should be existed!",ButtonType.OK).show();
+                return;
+            }
+        }
         try {
             PreparedStatement stm = connection.prepareStatement("DELETE FROM user WHERE username=?");
             stm.setString(1,tm.getUsername());
