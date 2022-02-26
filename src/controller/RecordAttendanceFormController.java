@@ -10,15 +10,18 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import okhttp3.*;
+
 import security.SecurityContextHolder;
 
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.*;
@@ -156,9 +159,9 @@ public class RecordAttendanceFormController {
                 connection.commit();
                 if (rstStudent.next() && rstAttendance.next()) {
                     if (rstAttendance.getString("status").equals("IN")) {
-                        message = rstStudent.getString("name") + " is attending to the class. AT: " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Status: " + rstAttendance.getString("status");
+                        message = rstStudent.getString("name") + " is attending to the Maths class. AT: " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Status: " + rstAttendance.getString("status");
                     } else {
-                        message = rstStudent.getString("name") + " is leaving the class. AT: " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Status: " + rstAttendance.getString("status");
+                        message = rstStudent.getString("name") + " is leaving the Maths class. AT: " + dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " Status: " + rstAttendance.getString("status");
                     }
                     contact = rstStudent.getString("contact");
                 } else {
@@ -184,7 +187,7 @@ public class RecordAttendanceFormController {
                 HttpURLConnection connection1 = (HttpURLConnection) url.openConnection();
                 connection1.setRequestMethod("POST");
                 connection1.setRequestProperty("Content-Type","application/json");
-                connection1.setRequestProperty("Authorization","A4n2dulq9EZvFVNHsO4oufAqBtQTr4tj7WZYgkqskF9L9EQrcUhSm10OtBw3UOnVGoScqBmXIIKM5eCGsLdyu4CUmWfxwXHM10pMUtGKZ5OPhFSauEXWUqpfq07YW9j2Fu3Hf36uz8ShSVBNHtS9TKInYLRGrveo6a7MO5ftvU4t6Ha5T65wahDEdh1OCkghJclAH1Nj6ExcMm5BOWzseFlMALqIcmKc0xRCd02qhNVbv6WQRBEhlPnnogWG7yWwtxtFF087xkaGlhcyT6dCMXMmJyM6sa7cSNCyxaZA5OK3Oi4PA798pswC9tlvBMbLPPqKxZ3N7pz8U2S9thdMKJyQJsG6FFXBaIlE65fvdnMmvsdQHSx8Enee6utzGigczFUclT6be6RQDqksUPmNdOxlXrU6F3WOjUdZ7v3BodGHyvfW2yh6XsDSpVF7OaYnIbB0kgxUAV55bYpy6UdrK2j2QTwlEvPcKg59eZen9wdLtwJjEPxCXW2hEQeSXgelpB2rgvAGbUnB9ViqMJjCVc0ovA4sArNs0stcR4Qiw0o2nyhcL51SQb8Adm8axh2m2Tk49tdJzZu8hLB2jZ1mmTMcQwQqr1aeU7mv8Uh2S79wOFBKA2yhTCf1kG73KgaK8ieltQVRBNeJwR011gT5k72udiS3COQHNBE03WDfhdobVpT9oU7d5wLmGMh30AsAsNrq9beLWo3qU12hzfYamjbyWyDPlru68FFciVpAG1jo4oYCfz8lUCy1UPv6CL0MuTsm0uNfbxnIy5MttCfFHJQRXHDivPFHjRSaS0mVv8AmXzRtjBIlM4oM8uJohBZm4lZLeUTnXHChANxolPo3NOMkjbsz826uuraeyzuCaISGdt8C9GpoV8vSmjvBdDI4OW7ZcwBr1TJsO3sAZY9FpbyKprhAqRfzIxtNqpJuQgpVBnVCQNDIUkPWwzhjGhi9ozhaD4YSOjo3lU3zluzvS8chT8fQJf0aCfEqU4rF2Cesmto3ROTibGFfu1XxjkAv");
+                connection1.setRequestProperty("Authorization","Token Here");
 
                 connection1.setDoOutput(true);
                 connection1.getOutputStream().write(content.getBytes());
@@ -226,7 +229,10 @@ public class RecordAttendanceFormController {
             }
             updateLabels();
             sendSMS(txtStudentID.getText(),dateTime);
-
+            Media media = new Media(this.getClass().getResource("/assets/Barcode-scanner-beep-sound.mp3").toURI().toString());
+            MediaPlayer mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.setCycleCount(1);
+            mediaPlayer.play();
         } catch (Throwable e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Failed to initialize the database!", ButtonType.OK).show();

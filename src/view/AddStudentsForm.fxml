@@ -53,8 +53,8 @@
                 </VBox>
             </children>
         </HBox>
-        <Button fx:id="btnSaveStudent" defaultButton="true" layoutX="695.0" layoutY="246.0" mnemonicParsing="false" onAction="#btnSaveStudent_OnAction" text="Save Student" />
-        <TableView fx:id="tblStudents" layoutX="7.0" layoutY="297.0" prefHeight="542.0" prefWidth="927.0">
+        <Button fx:id="btnSaveStudent" defaultButton="true" layoutX="695.0" layoutY="263.0" mnemonicParsing="false" onAction="#btnSaveStudent_OnAction" prefHeight="10.0" prefWidth="110.0" text="Save Student" />
+        <TableView fx:id="tblStudents" layoutX="7.0" layoutY="306.0" prefHeight="533.0" prefWidth="927.0">
             <columns>
                 <TableColumn prefWidth="174.0" text="ID" />
                 <TableColumn prefWidth="289.0" text="Name with Initials" />
@@ -63,7 +63,7 @@
             <TableColumn prefWidth="141.0" text="Picture" />
             </columns>
         </TableView>
-        <Button fx:id="btnDeleteStudent" layoutX="815.0" layoutY="247.0" mnemonicParsing="false" onAction="#btnDeleteStudent_OnAction" prefHeight="26.0" prefWidth="117.0" text="Delete Student" />
-      <TextField fx:id="txtSearch" layoutX="9.0" layoutY="260.0" prefHeight="26.0" prefWidth="309.0" promptText="Search Here" />
+        <Button fx:id="btnDeleteStudent" layoutX="815.0" layoutY="264.0" mnemonicParsing="false" onAction="#btnDeleteStudent_OnAction" prefHeight="26.0" prefWidth="117.0" text="Delete Student" />
+      <TextField fx:id="txtSearch" layoutX="9.0" layoutY="274.0" prefHeight="26.0" prefWidth="309.0" promptText="Search Here" />
     </children>
 </AnchorPane>
