@@ -57,7 +57,7 @@
       <PasswordField fx:id="txtConfirmPassword" layoutX="61.0" layoutY="174.0" prefHeight="26.0" prefWidth="210.0" promptText="Confirm Password" />
       <Button fx:id="btnCreateRole" defaultButton="true" layoutX="555.0" layoutY="221.0" mnemonicParsing="false" onAction="#btnCreateRoleOnAction" prefHeight="35.0" prefWidth="124.0" style="-fx-background-color: #3dcfff;" text="Create Role">
          <cursor>
-            <Cursor fx:constant="OPEN_HAND" />
+            <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
       <MenuButton fx:id="menuRole" layoutX="332.0" layoutY="175.0" mnemonicParsing="false" text="Select Role">
@@ -68,7 +68,7 @@
       </MenuButton>
       <Button fx:id="btnUpdateRole" layoutX="694.0" layoutY="221.0" mnemonicParsing="false" onAction="#btnUpdateRoleOnAction" prefHeight="35.0" prefWidth="124.0" style="-fx-background-color: #3dff6a;" text="Update Role">
          <cursor>
-            <Cursor fx:constant="OPEN_HAND" />
+            <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
       <Button fx:id="btnAddNewUser" contentDisplay="RIGHT" layoutX="609.0" layoutY="14.0" mnemonicParsing="false" onAction="#btnAddNewUserOnAction" prefHeight="62.0" prefWidth="212.0" style="-fx-background-color: #d1fffd;" text="+Add New User">
@@ -80,8 +80,38 @@
             </ImageView>
          </graphic>
          <cursor>
-            <Cursor fx:constant="OPEN_HAND" />
+            <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
+      <Label layoutX="59.0" layoutY="98.0" prefHeight="16.0" prefWidth="156.0" style="-fx-text-fill: #0094ff;" text="Enter the Username">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="328.0" layoutY="98.0" prefHeight="16.0" prefWidth="223.0" style="-fx-text-fill: #0094ff;" text="Enter the First and last Name">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="597.0" layoutY="98.0" prefHeight="16.0" prefWidth="175.0" style="-fx-text-fill: #0094ff;" text="Enter the Password">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="597.0" layoutY="148.0" prefHeight="16.0" prefWidth="175.0" style="-fx-text-fill: #ff0000;" text="Should be at least 4 charactors">
+         <font>
+            <Font size="9.0" />
+         </font>
+      </Label>
+      <Label layoutX="62.0" layoutY="157.0" prefHeight="16.0" prefWidth="175.0" style="-fx-text-fill: #0094ff;" text="Confirm Password">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="333.0" layoutY="158.0" prefHeight="16.0" prefWidth="124.0" style="-fx-text-fill: #0094ff;" text="Select Role">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
