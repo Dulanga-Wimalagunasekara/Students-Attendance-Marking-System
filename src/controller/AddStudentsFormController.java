@@ -1,5 +1,11 @@
 package controller;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import db.DBConnection;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -24,7 +30,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 public class AddStudentsFormController {
@@ -42,8 +50,11 @@ public class AddStudentsFormController {
     public TextField txtSearch;
     private ObservableList<studentTM> items;
 
-    public void initialize() {
-
+    public void initialize() throws IOException {
+        Path path = Paths.get("/home/dulanga/Documents/QR_Codes");
+        if (!Files.isDirectory(path)){
+            Files.createDirectory(path);
+        }
         choGrade.getItems().addAll("06", "07", "08", "09", "10", "11");
         disableControls(true);
         btnNewStudent.requestFocus();
@@ -241,6 +252,14 @@ public class AddStudentsFormController {
                             txtName.getText(), bytes, txtContact.getText()));
                     tblStudents.refresh();
 
+                    String content=txtId.getText();
+                    Path path1 = Paths.get("/home/dulanga/Documents/QR_Codes",txtId.getText().replace("/","_")+" - "+txtName.getText() + ".png");
+                    String pathQr = path1.toString();
+                    String charset="UTF-8";
+                    Map<EncodeHintType, ErrorCorrectionLevel> hashMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
+                    hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+                    generateQr(content,pathQr,charset,hashMap,200,200);
+
                 } catch (SQLException | IOException e) {
                     e.printStackTrace();
                     new Alert(Alert.AlertType.ERROR, "Something went wrong! Please try again!").show();
@@ -346,6 +365,15 @@ public class AddStudentsFormController {
     public void AddNewOnKeyPressed(KeyEvent keyEvent) {
         if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
             ((Stage) btnNewStudent.getScene().getWindow()).close();
+        }
+    }
+
+    public void generateQr(String data, String path, String charset, Map map, int h, int w){
+        try{
+            BitMatrix matrix = new MultiFormatWriter().encode(new String(data.getBytes(charset), charset), BarcodeFormat.QR_CODE, w, h);
+            MatrixToImageWriter.writeToFile(matrix, path.substring(path.lastIndexOf('.') + 1), new File(path));
+        }catch (Throwable e){
+            e.printStackTrace();
         }
     }
 }
