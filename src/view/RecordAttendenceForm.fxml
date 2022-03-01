@@ -27,7 +27,7 @@
                 <Image url="@assets/qr-code.png" />
             </image>
         </ImageView>
-        <Label fx:id="lblStudentName" alignment="CENTER" layoutX="10.0" layoutY="105.0" text="Please enter/scan the student ID to proceed" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+        <Label fx:id="lblStudentName" alignment="CENTER" layoutX="10.0" layoutY="115.0" text="Please enter/scan the student ID to proceed" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
         <FlowPane alignment="CENTER" hgap="15.0" layoutY="342.0" prefHeight="58.0" prefWidth="414.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
             <ToggleButton fx:id="btnIn" cache="true" cacheHint="SPEED" mnemonicParsing="false" prefHeight="38.0" prefWidth="107.0" style="-fx-background-color: green; -fx-text-fill: white;" text="IN">

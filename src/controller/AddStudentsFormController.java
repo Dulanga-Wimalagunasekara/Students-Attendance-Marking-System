@@ -51,7 +51,7 @@ public class AddStudentsFormController {
     private ObservableList<studentTM> items;
 
     public void initialize() throws IOException {
-        Path path = Paths.get("/home/dulanga/Documents/QR_Codes");
+        Path path = Paths.get("C:\\Users\\Asus\\Desktop\\QR_Codes");
         if (!Files.isDirectory(path)){
             Files.createDirectory(path);
         }
@@ -253,12 +253,12 @@ public class AddStudentsFormController {
                     tblStudents.refresh();
 
                     String content=txtId.getText();
-                    Path path1 = Paths.get("/home/dulanga/Documents/QR_Codes",txtId.getText().replace("/","_")+" - "+txtName.getText() + ".png");
+                    Path path1 = Paths.get("C:\\Users\\Asus\\Desktop\\QR_Codes",txtId.getText().replace("/","_")+" - "+txtName.getText() + ".png");
                     String pathQr = path1.toString();
                     String charset="UTF-8";
                     Map<EncodeHintType, ErrorCorrectionLevel> hashMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
                     hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
-                    generateQr(content,pathQr,charset,hashMap,200,200);
+                    generateQr(content,pathQr,charset,hashMap,250,250);
 
                 } catch (SQLException | IOException e) {
                     e.printStackTrace();

@@ -12,6 +12,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -20,10 +21,11 @@ import security.SecurityContextHolder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.*;
 import java.sql.*;
 import java.sql.Connection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -107,14 +109,42 @@ public class RecordAttendanceFormController {
 
     }
 
-    public void txtStudentID_OnAction(ActionEvent actionEvent) {
+    public void txtStudentID_OnAction(ActionEvent actionEvent) throws URISyntaxException {
 
+        lblStudentName.setTextFill(Paint.valueOf("#000000"));
         lblStudentName.setText("Please enter/scan the student ID to proceed");
         imgProfile.setImage(new Image("/view/assets/qr-code.png"));
 
         if (txtStudentID.getText().trim().isEmpty()) {
             return;
         }
+        try {
+            Connection con = DBConnection.getInstance().getConnection();
+            String format = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            PreparedStatement stmTxt = con.prepareStatement("SELECT date FROM attendance WHERE student_id=? AND date BETWEEN ? AND ? ORDER BY id DESC LIMIT 1");
+            stmTxt.setString(1,txtStudentID.getText());
+            stmTxt.setString(2,format+" 00:00:00");
+            stmTxt.setString(3,format+" 23:59:59");
+            ResultSet rstTxt = stmTxt.executeQuery();
+            if (rstTxt.next()){
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+                Date time1 = simpleDateFormat.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                Date time2 = simpleDateFormat.parse(rstTxt.getTime("date").toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                if (time1.getTime()-time2.getTime()<60000){
+                    imgProfile.setImage(new Image("/view/assets/confused.png"));
+                    lblStudentName.setText("Duplicates found in one minute!");
+                    lblStudentName.setTextFill(Paint.valueOf("#ff0000"));
+                    Media media = new Media(this.getClass().getResource("/assets/Notification.mp3").toURI().toString());
+                    MediaPlayer mediaPlayer = new MediaPlayer(media);
+                    mediaPlayer.play();
+                    txtStudentID.selectAll();
+                    return;
+                }
+            }
+        } catch (SQLException | ParseException e) {
+            e.printStackTrace();
+        }
+
 
         try {
             stm.setString(1, txtStudentID.getText().trim());
@@ -185,7 +215,7 @@ public class RecordAttendanceFormController {
                 HttpURLConnection connection1 = (HttpURLConnection) url.openConnection();
                 connection1.setRequestMethod("POST");
                 connection1.setRequestProperty("Content-Type","application/json");
-                connection1.setRequestProperty("Authorization","Token Here");
+                connection1.setRequestProperty("Authorization","TOKEN HERE");
 
                 connection1.setDoOutput(true);
                 connection1.getOutputStream().write(content.getBytes());
