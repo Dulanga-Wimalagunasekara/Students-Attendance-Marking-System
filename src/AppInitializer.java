@@ -7,10 +7,12 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 
 public class AppInitializer extends Application {
 
     public static void main(String[] args) {
+//        System.out.println(Paths.get(System.getProperty("user.home"), "documents"));
         launch(args);
     }
 

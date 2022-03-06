@@ -7,6 +7,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import db.DBConnection;
+
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,10 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class AddStudentsFormController {
 
@@ -51,11 +49,11 @@ public class AddStudentsFormController {
     private ObservableList<studentTM> items;
 
     public void initialize() throws IOException {
-        Path path = Paths.get("C:\\Users\\Asus\\Desktop\\QR_Codes");
+        Path path = Paths.get(System.getProperty("user.home"),"Documents/QR_Codes");
         if (!Files.isDirectory(path)){
             Files.createDirectory(path);
         }
-        choGrade.getItems().addAll("06", "07", "08", "09", "10", "11");
+        choGrade.getItems().addAll("06", "07", "08", "09", "10", "11","12");
         disableControls(true);
         btnNewStudent.requestFocus();
 
@@ -79,6 +77,7 @@ public class AddStudentsFormController {
             ImageView imageView = new ImageView(new Image(byteArrayInputStream));
             imageView.setFitHeight(75);
             imageView.setFitWidth(75);
+            imageView.setRotate(90);
             return new ReadOnlyObjectWrapper<>(imageView);
         });
 
@@ -127,32 +126,36 @@ public class AddStudentsFormController {
     }
 
     private void filterList() {
-        FilteredList<studentTM> filteredList = new FilteredList<>(items);
-        tblStudents.setItems(filteredList);
-        String text = txtSearch.getText().toUpperCase(Locale.ROOT);
+        new Thread(() -> {
+            FilteredList<studentTM> filteredList = new FilteredList<>(items);
+            tblStudents.setItems(filteredList);
+            String text = txtSearch.getText().toUpperCase(Locale.ROOT);
 
-        filteredList.setPredicate(val -> val.getStId().toUpperCase(Locale.ROOT).contains(text) || String.valueOf(val.getGrade()).contains(text) ||
-                val.getName().toUpperCase(Locale.ROOT).contains(text) || val.getContact().toUpperCase(Locale.ROOT).contains(text));
+            filteredList.setPredicate(val -> val.getStId().toUpperCase(Locale.ROOT).contains(text) || String.valueOf(val.getGrade()).contains(text) ||
+                    val.getName().toUpperCase(Locale.ROOT).contains(text) || val.getContact().toUpperCase(Locale.ROOT).contains(text));
+        }).start();
     }
 
     private void loadAllStudents() {
-        Connection connection = DBConnection.getInstance().getConnection();
-        try {
-            items = FXCollections.observableArrayList();
-            PreparedStatement stm = connection.prepareStatement("SELECT * FROM student");
-            ResultSet rst = stm.executeQuery();
-            while (rst.next()) {
-                Blob picture = rst.getBlob("picture");
-                byte[] bytes = picture.getBytes(1, (int) picture.length());
-                items.add(new studentTM(rst.getString("id"), rst.getInt("grade"),
-                        rst.getString("name"), bytes, rst.getString("contact")));
+        new Thread(() -> {
+            Connection connection = DBConnection.getInstance().getConnection();
+            try {
+                items = FXCollections.observableArrayList();
+                PreparedStatement stm = connection.prepareStatement("SELECT * FROM student");
+                ResultSet rst = stm.executeQuery();
+                while (rst.next()) {
+                    Blob picture = rst.getBlob("picture");
+                    byte[] bytes = picture.getBytes(1, (int) picture.length());
+                    items.add(new studentTM(rst.getString("id"), rst.getInt("grade"),
+                            rst.getString("name"), bytes, rst.getString("contact")));
+                }
+                tblStudents.setItems(items);
+                txtSearch.clear();
+                System.gc();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            tblStudents.setItems(items);
-            txtSearch.clear();
-            System.gc();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        }).start();
     }
 
     private void generateId(String value) {
@@ -193,121 +196,131 @@ public class AddStudentsFormController {
         btnBrowse.setDisable(val);
     }
 
-    public void btnDeleteStudent_OnAction(ActionEvent actionEvent) throws SQLException {
-        studentTM selectedItem = tblStudents.getSelectionModel().getSelectedItem();
-        Connection connection = DBConnection.getInstance().getConnection();
-        ObservableList<studentTM> items = tblStudents.getItems();
-        try {
-            connection.setAutoCommit(false);
-            PreparedStatement stm1 = connection.prepareStatement("DELETE FROM attendance WHERE student_id=?");
-            stm1.setString(1,selectedItem.getStId());
-            PreparedStatement stm = connection.prepareStatement("DELETE FROM student WHERE id=?");
-            stm.setString(1,selectedItem.getStId());
-            Optional<ButtonType> buttonType = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete the student",ButtonType.YES,ButtonType.NO).showAndWait();
-            if (buttonType.get().equals(ButtonType.YES)){
-                stm1.executeUpdate();
-                int i = stm.executeUpdate();
-                if (i!=1){
-                    throw new RuntimeException("Something went wrong! Please try again!");
-                }else {
-                    connection.commit();
-                    new Alert(Alert.AlertType.CONFIRMATION,"Deleted Successfully!",ButtonType.OK).show();
-                    loadAllStudents();
+    public void btnDeleteStudent_OnAction(ActionEvent actionEvent){
+            studentTM selectedItem = tblStudents.getSelectionModel().getSelectedItem();
+            Connection connection = DBConnection.getInstance().getConnection();
+            try {
+                connection.setAutoCommit(false);
+                PreparedStatement stm1 = connection.prepareStatement("DELETE FROM attendance WHERE student_id=?");
+                stm1.setString(1,selectedItem.getStId());
+                PreparedStatement stm = connection.prepareStatement("DELETE FROM student WHERE id=?");
+                stm.setString(1,selectedItem.getStId());
+                Optional<ButtonType> buttonType = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete the student",ButtonType.YES,ButtonType.NO).showAndWait();
+                if (buttonType.get().equals(ButtonType.YES)){
+                    stm1.executeUpdate();
+                    int i = stm.executeUpdate();
+                    if (i!=1){
+                        throw new RuntimeException("Something went wrong! Please try again!");
+                    }else {
+                        connection.commit();
+                        new Alert(Alert.AlertType.CONFIRMATION,"Deleted Successfully!",ButtonType.OK).show();
+                        loadAllStudents();
+                    }
                 }
-            }
 
-        } catch (Throwable e) {
-            connection.rollback();
-            new Alert(Alert.AlertType.ERROR,"Something went wrong! Please try again!",ButtonType.OK).show();
-            e.printStackTrace();
-        }finally {
-            connection.setAutoCommit(true);
-            tblStudents.getSelectionModel().clearSelection();
-            clearFields();
-            disableControls(true);
-            btnNewStudent.setDisable(false);
-        }
+            } catch (Throwable e) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                new Alert(Alert.AlertType.ERROR,"Something went wrong! Please try again!",ButtonType.OK).show();
+                e.printStackTrace();
+            }finally {
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                tblStudents.getSelectionModel().clearSelection();
+                clearFields();
+                disableControls(true);
+                btnNewStudent.setDisable(false);
+            }
     }
 
     public void btnSaveStudent_OnAction(ActionEvent actionEvent) {
-        if (btnSaveStudent.getText().equals("Save Student")){
-            if (Isvalidated()) {
-                String value = choGrade.getSelectionModel().getSelectedItem();
-                Connection connection = DBConnection.getInstance().getConnection();
-                Path path = Paths.get(txtPicture.getText());
-                try {
-                    byte[] bytes = Files.readAllBytes(path);
-                    PreparedStatement stm = connection.prepareStatement("INSERT INTO student (id, name, picture,contact,grade) VALUES (?,?,?,?,?)");
-                    stm.setString(1, txtId.getText());
-                    stm.setString(2, txtName.getText());
-                    stm.setBlob(3, new SerialBlob(bytes));
-                    stm.setString(4, txtContact.getText());
-                    stm.setInt(5, Integer.parseInt(value));
-                    int i = stm.executeUpdate();
-                    if (i == 1) {
-                        new Alert(Alert.AlertType.CONFIRMATION, "Added Successfully!", ButtonType.OK).show();
-                    }
-
-                    items.add(new studentTM(txtId.getText(), Integer.parseInt(choGrade.getValue()),
-                            txtName.getText(), bytes, txtContact.getText()));
-                    tblStudents.refresh();
-
-                    String content=txtId.getText();
-                    Path path1 = Paths.get("C:\\Users\\Asus\\Desktop\\QR_Codes",txtId.getText().replace("/","_")+" - "+txtName.getText() + ".png");
-                    String pathQr = path1.toString();
-                    String charset="UTF-8";
-                    Map<EncodeHintType, ErrorCorrectionLevel> hashMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
-                    hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
-                    generateQr(content,pathQr,charset,hashMap,250,250);
-
-                } catch (SQLException | IOException e) {
-                    e.printStackTrace();
-                    new Alert(Alert.AlertType.ERROR, "Something went wrong! Please try again!").show();
-                }
-                clearFields();
-                choGrade.setValue(value);
-                btnNewStudent.setDisable(false);
-                txtName.requestFocus();
-
-            }
-        }else {
-            if (Isvalidated()){
-                try {
-                    String sql;
-                    byte[] bytes=null;
-                    if (txtPicture.getText().equals("[PICTURE]")){
-                        sql="UPDATE student SET name=?,contact=? WHERE id=?";
-                    }else {
-                        Path path = Paths.get(txtPicture.getText());
-                        bytes = Files.readAllBytes(path);
-                        sql="UPDATE student SET name=?,contact=?,picture=? WHERE id=?";
-                    }
+            if (btnSaveStudent.getText().equals("Save Student")){
+                if (Isvalidated()) {
+                    String value = choGrade.getSelectionModel().getSelectedItem();
                     Connection connection = DBConnection.getInstance().getConnection();
-                    PreparedStatement stm = connection.prepareStatement(sql);
-                    stm.setString(1,txtName.getText());
-                    stm.setString(2,txtContact.getText());
-                    if (!txtPicture.getText().equals("[PICTURE]") && bytes!=null){
-                        stm.setBlob(3,new SerialBlob(bytes));
-                        stm.setString(4,txtId.getText());
-                    }else {
-                        stm.setString(3,txtId.getText());
+                    Path path = Paths.get(txtPicture.getText());
+                    try {
+                        byte[] bytes = Files.readAllBytes(path);
+                        PreparedStatement stm = connection.prepareStatement("INSERT INTO student (id, name, picture,contact,grade) VALUES (?,?,?,?,?)");
+                        stm.setString(1, txtId.getText());
+                        stm.setString(2, txtName.getText());
+                        stm.setBlob(3, new SerialBlob(bytes));
+                        stm.setString(4, txtContact.getText());
+                        stm.setInt(5, Integer.parseInt(value));
+                        int i = stm.executeUpdate();
+                        if (i == 1) {
+                            showAltert(Alert.AlertType.CONFIRMATION,"Added Successfully",ButtonType.OK);
+                        }
+
+                        items.add(new studentTM(txtId.getText(), Integer.parseInt(choGrade.getValue()),
+                                    txtName.getText(), bytes, txtContact.getText()));
+                        tblStudents.refresh();
+                        String content=txtId.getText();
+                        Path path1 = Paths.get(System.getProperty("user.home"),"Documents/QR_Codes",txtId.getText().replace("/","_")+" - "+txtName.getText() + ".png");
+                        String pathQr = path1.toString();
+                        String charset="UTF-8";
+                        Map<EncodeHintType, ErrorCorrectionLevel> hashMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
+                        hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+                        generateQr(content,pathQr,charset,hashMap,250,250);
+
+                    } catch (SQLException | IOException e) {
+                        e.printStackTrace();
+                        showAltert(Alert.AlertType.ERROR,"Something went wrong! Please try again!",ButtonType.OK);
                     }
-                    int i = stm.executeUpdate();
-                    if (i!=1){
-                        throw new RuntimeException("Update Failed!");
-                    }else {
-                        new Alert(Alert.AlertType.CONFIRMATION,"Updated Successfully!",ButtonType.OK).show();
+                        clearFields();
+                        choGrade.setValue(value);
+                        btnNewStudent.setDisable(false);
+                        txtName.requestFocus();
+                }
+            }else {
+                if (Isvalidated()){
+                    try {
+                        String sql;
+                        byte[] bytes=null;
+                        if (txtPicture.getText().equals("[PICTURE]")){
+                            sql="UPDATE student SET name=?,contact=? WHERE id=?";
+                        }else {
+                            Path path = Paths.get(txtPicture.getText());
+                            bytes = Files.readAllBytes(path);
+                            sql="UPDATE student SET name=?,contact=?,picture=? WHERE id=?";
+                        }
+                        Connection connection = DBConnection.getInstance().getConnection();
+                        PreparedStatement stm = connection.prepareStatement(sql);
+                        stm.setString(1,txtName.getText());
+                        stm.setString(2,txtContact.getText());
+                        if (!txtPicture.getText().equals("[PICTURE]") && bytes!=null){
+                            stm.setBlob(3,new SerialBlob(bytes));
+                            stm.setString(4,txtId.getText());
+                        }else {
+                            stm.setString(3,txtId.getText());
+                        }
+                        int i = stm.executeUpdate();
+                        if (i!=1){
+                            throw new RuntimeException("Update Failed!");
+                        }else {
+                            showAltert(Alert.AlertType.CONFIRMATION,"Updated Successfully!",ButtonType.OK);
+                        }
+                    } catch (Throwable e) {
+                        showAltert(Alert.AlertType.ERROR,"Update Failed! Please try again!",ButtonType.OK);
+                        e.printStackTrace();
+                    }finally {
+                            tblStudents.getSelectionModel().clearSelection();
+                            clearFields();
+                            loadAllStudents();
                     }
-                } catch (Throwable e) {
-                    new Alert(Alert.AlertType.ERROR,"Update Failed! Please try again!",ButtonType.OK).show();
-                    e.printStackTrace();
-                }finally {
-                    tblStudents.getSelectionModel().clearSelection();
-                    clearFields();
-                    loadAllStudents();
                 }
             }
-        }
+
+    }
+
+    private void showAltert(Alert.AlertType type,String Content,ButtonType btnType) {
+            new Alert(type,Content,btnType).show();
     }
 
     private void clearFields() {
@@ -342,12 +355,16 @@ public class AddStudentsFormController {
         }
     }
 
+    private File recentDirectory = new File(System.getProperty("user.home"),"Documents");
+
     public void btnBrowse_OnAction(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images",
                 "*.jpg", "*.png"));
+        fileChooser.setInitialDirectory(recentDirectory);
         File file = fileChooser.showOpenDialog(btnNewStudent.getScene().getWindow());
         if (file!=null){
+            recentDirectory = file.getParentFile();
             txtPicture.setText(file.getAbsolutePath());
         }
     }
@@ -369,11 +386,14 @@ public class AddStudentsFormController {
     }
 
     public void generateQr(String data, String path, String charset, Map map, int h, int w){
-        try{
-            BitMatrix matrix = new MultiFormatWriter().encode(new String(data.getBytes(charset), charset), BarcodeFormat.QR_CODE, w, h);
-            MatrixToImageWriter.writeToFile(matrix, path.substring(path.lastIndexOf('.') + 1), new File(path));
-        }catch (Throwable e){
-            e.printStackTrace();
-        }
+        new Thread(() -> {
+            try{
+                BitMatrix matrix = new MultiFormatWriter().encode(new String(data.getBytes(charset), charset), BarcodeFormat.QR_CODE, w, h);
+                MatrixToImageWriter.writeToFile(matrix, path.substring(path.lastIndexOf('.') + 1), new File(path));
+            }catch (Throwable e){
+                e.printStackTrace();
+            }
+        }).start();
     }
+
 }

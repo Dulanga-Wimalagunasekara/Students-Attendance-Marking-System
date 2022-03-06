@@ -17,6 +17,9 @@ import javafx.stage.Stage;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import view.TM.attendanceTM;
 
 import java.io.File;
@@ -180,10 +183,10 @@ public class ViewReportsFormController {
     public void btnBackupOnAction(ActionEvent actionEvent) {
         ObservableList<attendanceTM> tblItems =tblAttendance.getItems();
 
-        HSSFWorkbook book = new HSSFWorkbook();
-        HSSFSheet sheet = book.createSheet();
+        XSSFWorkbook book = new XSSFWorkbook();
+        XSSFSheet sheet = book.createSheet();
 
-        HSSFRow row = sheet.createRow(0);
+        XSSFRow row = sheet.createRow(0);
         for (int i = 0; i <tblAttendance.getColumns().size(); i++) {
             row.createCell(i).setCellValue(tblAttendance.getColumns().get(i).getText());
         }
@@ -197,7 +200,7 @@ public class ViewReportsFormController {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showSaveDialog(btnFilter.getScene().getWindow());
         if (file!=null){
-            Path path = Paths.get(file.getAbsolutePath()+".ods");
+            Path path = Paths.get(file.getAbsolutePath()+".xlsx");
             try {
                 OutputStream outputStream = Files.newOutputStream(path);
                 book.write(outputStream);
