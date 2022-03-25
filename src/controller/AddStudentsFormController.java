@@ -8,6 +8,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import db.DBConnection;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,12 +22,16 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import view.TM.studentTM;
 
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,6 +51,7 @@ public class AddStudentsFormController {
     public Button btnDeleteStudent;
     public Button btnNewStudent;
     public TextField txtSearch;
+    public Button btnBackup;
     private ObservableList<studentTM> items;
 
     public void initialize() throws IOException {
@@ -396,4 +402,46 @@ public class AddStudentsFormController {
         }).start();
     }
 
+    public void btnBackupOnAction(ActionEvent actionEvent) {
+            try {
+                Connection connection = DBConnection.getInstance().getConnection();
+                PreparedStatement stm = connection.prepareStatement("SELECT id,name,grade,contact FROM student");
+                ResultSet rst = stm.executeQuery();
+
+                XSSFWorkbook book = new XSSFWorkbook();
+                XSSFSheet sheet = book.createSheet();
+                XSSFRow row = sheet.createRow(0);
+
+                row.createCell(0).setCellValue("ID");
+                row.createCell(1).setCellValue("Name");
+                row.createCell(2).setCellValue("Grade");
+                row.createCell(3).setCellValue("Contact");
+                int rowCount=1;
+                while (rst.next()){
+                    row=sheet.createRow(rowCount);
+                    for (int i = 0; i < 3; i++) {
+                        row.createCell(i).setCellValue(rst.getString(i+1));
+                    }
+                    row.createCell(3).setCellValue(rst.getInt("contact"));
+                    rowCount++;
+                }
+                    FileChooser fileChooser = new FileChooser();
+                    File file = fileChooser.showSaveDialog(btnNewStudent.getScene().getWindow());
+                    if (file!=null){
+                        Path path = Paths.get(file.getAbsolutePath()+".xlsx");
+                        try {
+                            OutputStream outputStream = Files.newOutputStream(path);
+                            book.write(outputStream);
+                            outputStream.close();
+                            new Alert(Alert.AlertType.CONFIRMATION,"Backup Success!",ButtonType.OK).show();
+                        } catch (IOException e) {
+                            new Alert(Alert.AlertType.ERROR,"Something went wrong! Please try again!",ButtonType.OK).show();
+                            e.printStackTrace();
+                        }
+                    }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+    }
 }
