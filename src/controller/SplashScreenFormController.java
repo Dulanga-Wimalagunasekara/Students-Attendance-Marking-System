@@ -7,8 +7,11 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -45,7 +48,13 @@ public class SplashScreenFormController {
                 e.printStackTrace();
             } catch (SQLException e) {
                 if (e.getSQLState().equals("42000")) {
-                    Platform.runLater(this::loadImportDBForm);
+                    Platform.runLater(() -> {
+                        try {
+                            loadImportDBForm();
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+                    });
 
                 } else {
                     shutdownApp(e);
@@ -56,8 +65,7 @@ public class SplashScreenFormController {
         }).start();
     }
 
-    private void loadImportDBForm() {
-
+    private void loadImportDBForm() throws SQLException {
         try {
 
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/ImportDBForm.fxml"));
@@ -121,9 +129,25 @@ public class SplashScreenFormController {
                 }).start();
 
             } else {
-                /*Todo:Restore the backup and Handle the Exceptions*/
-                System.out.println("Restoring...!");
-//                LoadLoginForm(connection);
+                File file = fileProperty.getValue();
+                ProcessBuilder processBuilder = new ProcessBuilder("mysql", "-h", "localhost", "-u", "root", "-proot");
+                processBuilder.redirectInput(file);
+                try {
+                    Process start = processBuilder.start();
+                    int i = start.waitFor();
+                    if (i==0){
+                        new Alert(Alert.AlertType.CONFIRMATION,"Successfully Restored!", ButtonType.OK).showAndWait();
+                        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dep8_student_attendance", "root", "root");
+                        sleep(500);
+                        DBConnection.getInstance().init(connection);
+                        Platform.runLater(() -> {
+                            lblStatus.setText("Obtaining a new DB Connection...");
+                            LoadLoginForm(connection);
+                        });
+                    }
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
         } catch (IOException e) {

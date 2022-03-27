@@ -83,7 +83,7 @@ public class AddStudentsFormController {
             ImageView imageView = new ImageView(new Image(byteArrayInputStream));
             imageView.setFitHeight(75);
             imageView.setFitWidth(75);
-            imageView.setRotate(90);
+//            imageView.setRotate(90);
             return new ReadOnlyObjectWrapper<>(imageView);
         });
 

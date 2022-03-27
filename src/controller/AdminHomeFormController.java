@@ -8,11 +8,13 @@ import javafx.scene.control.Label;
 
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import security.SecurityContextHolder;
 
 
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class AdminHomeFormController {
     public Label lblHover;
@@ -77,7 +79,17 @@ public class AdminHomeFormController {
     }
 
     public void btnBackupRestore_OnAction(ActionEvent actionEvent) throws IOException {
-
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/BackupAndRestoreForm.fxml"));
+        AnchorPane load = fxmlLoader.load();
+        Scene scene = new Scene(load);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.setTitle("Admin Home: Backup and Restore");
+        stage.sizeToScene();
+        stage.setResizable(false);
+        stage.initOwner(btnRecordAttendance.getScene().getWindow());
+        stage.show();
     }
 
     public void btnSignOut_OnAction(ActionEvent actionEvent) throws IOException {

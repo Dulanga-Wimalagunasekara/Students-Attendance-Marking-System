@@ -154,7 +154,7 @@ public class RecordAttendanceFormController {
                 lblStudentName.setText(rst.getString("name").toUpperCase());
                 InputStream is = rst.getBlob("picture").getBinaryStream();
                 imgProfile.setImage(new Image(is));
-                imgProfile.setRotate(90);
+//                imgProfile.setRotate(90);
                 insertIntoDatabase(rst.getString("name"), rst.getString("id"), rst.getString("grade"));
                 txtStudentID.selectAll();
             } else {
@@ -216,7 +216,7 @@ public class RecordAttendanceFormController {
                 HttpURLConnection connection1 = (HttpURLConnection) url.openConnection();
                 connection1.setRequestMethod("POST");
                 connection1.setRequestProperty("Content-Type","application/json");
-                connection1.setRequestProperty("Authorization","");
+                connection1.setRequestProperty("Authorization","TOKEN HERE");
 
                 connection1.setDoOutput(true);
                 connection1.getOutputStream().write(content.getBytes());

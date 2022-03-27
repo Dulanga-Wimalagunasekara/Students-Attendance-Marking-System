@@ -21,15 +21,12 @@ public class ImportDBFormController {
 
     public void initialize(){
         txtBrowse.setEditable(false);
-        rdoRestore.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            btnOK.setDisable(txtBrowse.getText().isEmpty() && newValue);
-        });
     }
 
     public void btnBrowse_OnAction(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Set BackUp Files");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("BackUp File","*.dep8backup"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("BackUp File","*.dep8back"));
         File file = fileChooser.showOpenDialog(btnOK.getScene().getWindow());
         txtBrowse.setText(file!=null? file.getAbsolutePath():"");
         fileProperty.setValue(file);
@@ -43,7 +40,6 @@ public class ImportDBFormController {
     }
 
     public void initFileProperty(SimpleObjectProperty<File> fileProperty){
-
         this.fileProperty=fileProperty;
     }
 }
